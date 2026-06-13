@@ -1,0 +1,11 @@
+{
+  "name": "Sistema de Control de Manuales y Gestión Documental - Puebla",
+  "description": "Plataforma institucional del Gobierno de Puebla para la gestión de manuales de organización, procedimientos y control interno.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
