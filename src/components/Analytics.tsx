@@ -1,6 +1,21 @@
 import React, { useState } from 'react';
 import { Cuestionario, User } from '../types';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
+
+const PREGUNTAS_MAP = [
+  { key: 'p1' as const, num: 1, label: '¿Quién es el enlace designado oficialmente para la elaboración de manuales en su dependencia?' },
+  { key: 'p2' as const, num: 2, label: '¿Tiene dudas o inquietudes particulares sobre la metodología de la Dirección de Capital Humano?' },
+  { key: 'p3' as const, num: 3, label: '¿Cuál es su principal obstáculo al redactar la redacción del objetivo y el alcance de un procedimiento?' },
+  { key: 'p4' as const, num: 4, label: 'En el último periodo de observaciones de la DGCH, ¿cuántos días tardó aproximadamente en solventar?' },
+  { key: 'p6' as const, num: 5, label: '¿Cuáles son las discrepancias actuales en la estructura de puestos (Validados vs Autorizados)?' },
+  { key: 'p7' as const, num: 6, label: '¿Con cuántos procedimientos vigentes cuenta su Dirección General que urjan actualización?' },
+  { key: 'p8' as const, num: 7, label: '¿Cuenta el área con Reglamento Interior debidamente publicado y vigente en el Periódico Oficial?' },
+  { key: 'p9' as const, num: 8, label: 'Identifique los mayores "cuellos de botella" en el proceso de revisión metodológica interna:' },
+  { key: 'p10' as const, num: 9, label: '¿El personal operativo a su cargo conoce plenamente la Visión y Misión institucional?' },
+  { key: 'p11' as const, num: 10, label: '¿Cuál es la frecuencia común de revisión técnica de sus procesos de operation interna?' },
+  { key: 'p12' as const, num: 11, label: '¿Qué porcentaje aproximado de los manuales del área se encuentran digitalizados y en intranet?' },
+  { key: 'p5' as const, num: 12, label: '¿Cuáles son sus propuestas de mejora o comentarios adicionales para agilizar este proceso de control?' },
+];
 
 interface AnalyticsProps {
   cuestionarios: Cuestionario[];
@@ -11,6 +26,8 @@ export const Analytics: React.FC<AnalyticsProps> = ({ cuestionarios, user }) => 
   const [searchTerm, setSearchTerm] = useState('');
   const [exerciseFilter, setExerciseFilter] = useState('All');
   const [typeFilter, setTypeFilter] = useState('All');
+  const [viewingCuestionario, setViewingCuestionario] = useState<Cuestionario | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   // Filter dataset based on permissions and input criteria
   const userRole = user.role;
@@ -250,7 +267,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ cuestionarios, user }) => 
         {/* Data Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-neutral-50 border-b border-neutral-200">
+            <thead className="bg-[#fcfdfd] border-b border-neutral-200">
               <tr>
                 <th className="px-6 py-3.5 text-xs font-bold text-neutral-500 uppercase tracking-widest">Folio</th>
                 <th className="px-6 py-3.5 text-xs font-bold text-neutral-500 uppercase tracking-widest">Ejercicio</th>
@@ -258,6 +275,7 @@ export const Analytics: React.FC<AnalyticsProps> = ({ cuestionarios, user }) => 
                 <th className="px-6 py-3.5 text-xs font-bold text-neutral-500 uppercase tracking-widest">Dependencia</th>
                 <th className="px-6 py-3.5 text-xs font-bold text-neutral-500 uppercase tracking-widest">Fecha Envío</th>
                 <th className="px-6 py-3.5 text-xs font-bold text-neutral-500 uppercase tracking-widest text-center">Estatus</th>
+                <th className="px-6 py-3.5 text-xs font-bold text-neutral-500 uppercase tracking-widest text-right">Acción</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-200 text-xs">
@@ -280,11 +298,26 @@ export const Analytics: React.FC<AnalyticsProps> = ({ cuestionarios, user }) => 
                         {row.solventacion ? 'Solventado' : 'Pendiente'}
                       </span>
                     </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => {
+                          setViewingCuestionario(row);
+                          setIsDetailsOpen(true);
+                        }}
+                        className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all border border-neutral-250 bg-white hover:bg-neutral-50 text-neutral-700 inline-flex items-center gap-1 cursor-pointer active:scale-95 shadow-sm"
+                      >
+                        <svg className="w-3.5 h-3.5 text-[#C09440]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <span>Ver Expediente</span>
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-neutral-500 font-medium font-sans">
+                  <td colSpan={7} className="px-6 py-12 text-center text-neutral-500 font-medium font-sans">
                     No se encontraron registros de cuestionarios bajo los filtros seleccionados.
                   </td>
                 </tr>
@@ -294,6 +327,90 @@ export const Analytics: React.FC<AnalyticsProps> = ({ cuestionarios, user }) => 
         </div>
 
       </div>
+
+      {/* EXPEDIENTE DETALLES DIALOG MODAL */}
+      <AnimatePresence>
+        {isDetailsOpen && viewingCuestionario && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsDetailsOpen(false)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            ></motion.div>
+
+            {/* Modal Body */}
+            <motion.div
+              initial={{ scale: 0.95, y: 15, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, y: 15, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl border border-neutral-100 overflow-hidden relative z-10 flex flex-col max-h-[90vh]"
+            >
+              {/* Header */}
+              <div className="relative bg-gradient-to-r from-[#0f172a] to-[#1e293b] text-white px-6 py-5 shrink-0">
+                <div className="absolute top-0 left-0 w-full h-[5px] bg-[#C09440]"></div>
+                <span className="text-[10px] bg-white/10 px-2.5 py-0.5 rounded-full font-mono uppercase tracking-widest font-bold">
+                  EXPEDIENTE DE RESPUESTAS: {viewingCuestionario.folio}
+                </span>
+                <h4 className="text-base font-bold mt-1.5 font-sans">Expediente de Cuestionario de Diagnóstico de Control</h4>
+                <p className="text-[11px] text-neutral-300 mt-0.5">Respuestas oficiales capturadas por el enlace operativo para sustento metodológico.</p>
+                <button 
+                  onClick={() => setIsDetailsOpen(false)} 
+                  className="absolute top-5 right-5 text-neutral-400 hover:text-white transition text-2xl cursor-pointer"
+                  aria-label="Cerrar modal"
+                >
+                  &times;
+                </button>
+              </div>
+
+              {/* Scrollable Answers Container */}
+              <div className="p-6 overflow-y-auto space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 font-sans">
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Procedencia / Dependencia</span>
+                    <span className="text-xs font-bold text-slate-800">{viewingCuestionario.dependencia}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Usuario Capturista / Fecha</span>
+                    <span className="text-xs font-bold text-slate-800">{viewingCuestionario.usuario} • {new Date(viewingCuestionario.fecha).toLocaleDateString('es-MX')}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h5 className="text-xs font-bold text-[#C09440] uppercase tracking-wider border-b border-slate-150 pb-1 font-sans">Cuestiones y Respuestas de Control Técnico</h5>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {PREGUNTAS_MAP.map((item) => (
+                      <div key={item.key} className="p-3.5 bg-slate-50/50 border border-slate-150 rounded-xl space-y-1 font-sans">
+                        <p className="text-[11px] font-bold text-slate-500 leading-tight font-sans">
+                          {item.num}. {item.label}
+                        </p>
+                        <p className="text-xs font-semibold text-slate-800 bg-white p-2.5 rounded-lg border border-slate-150 leading-relaxed min-h-[40px]">
+                          {viewingCuestionario[item.key] || 'No especificado'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex justify-end gap-2.5 p-4 border-t border-neutral-100 bg-neutral-50/50 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsDetailsOpen(false)}
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs shadow-md transition cursor-pointer uppercase tracking-wider font-sans focus:outline-none"
+                >
+                  Cerrar Expediente
+                </button>
+              </div>
+
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

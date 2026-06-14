@@ -9,7 +9,6 @@ import { Solventaciones } from './components/Solventaciones';
 import { Archivos } from './components/Archivos';
 import { Usuarios } from './components/Usuarios';
 import { Configuracion } from './components/Configuracion';
-import { HtmlPreview } from './components/HtmlPreview';
 import { db, handleFirestoreError, OperationType } from './firebase';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { motion } from 'motion/react';
@@ -21,7 +20,7 @@ const PRELOADED_CUESTIONARIOS: Cuestionario[] = [
     folio: 'PUE-SPF-2027-311',
     tipo: 'MANUAL DE ORGANIZACIÓN',
     usuario: 'comunicacion.adm@puebla.gob.mx',
-    dependencia: 'Secretaría de Planeación y Finanzas',
+    dependencia: 'Secretaría de Planeación, Finanzas y Administración',
     fecha: new Date(Date.now() - 36 * 3600 * 1000).toISOString(),
     estado: 'Enviado',
     p1: 'Lic. Gerardo Rosas Cuevas (Subdirector de Estructuras)',
@@ -68,7 +67,7 @@ const PRELOADED_CUESTIONARIOS: Cuestionario[] = [
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [activeTab, setActiveTab] = useState<'responder' | 'analytics' | 'solventaciones' | 'archivos' | 'usuarios' | 'configurar' | 'html_preview'>('responder');
+  const [activeTab, setActiveTab] = useState<'responder' | 'analytics' | 'solventaciones' | 'archivos' | 'usuarios' | 'configurar'>('responder');
   const [cuestionarios, setCuestionarios] = useState<Cuestionario[]>([]);
   const [usuarios, setUsuarios] = useState<User[]>([]);
   const [fileItems, setFileItems] = useState<FileItem[]>([]);
@@ -102,7 +101,7 @@ export default function App() {
       },
       {
         email: 'comunicacion.adm@puebla.gob.mx',
-        dependencia: 'Secretaría de Planeación y Finanzas',
+        dependencia: 'Secretaría de Planeación, Finanzas y Administración',
         role: 'user',
         loginTime: new Date().toISOString(),
         firstLogin: new Date().toISOString(),
@@ -320,16 +319,6 @@ export default function App() {
                     <span>Configurar</span>
                   </button>
                 )}
-
-                <button 
-                  onClick={() => setActiveTab('html_preview')}
-                  className={`whitespace-nowrap px-4 py-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 outline-none cursor-pointer ${activeTab === 'html_preview' ? 'border-[#C09440] text-slate-900 font-extrabold' : 'border-transparent text-slate-500 hover:text-slate-900'}`}
-                >
-                  <svg className="w-4 h-4 shrink-0 text-[#C09440]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                  </svg>
-                  <span>Código HTML</span>
-                </button>
  
               </div>
             </div>
@@ -368,9 +357,6 @@ export default function App() {
                   usuarios={usuarios} 
                   onClearLocalData={handleClearLocalData} 
                 />
-              )}
-              {activeTab === 'html_preview' && (
-                <HtmlPreview />
               )}
             </motion.div>
           </main>

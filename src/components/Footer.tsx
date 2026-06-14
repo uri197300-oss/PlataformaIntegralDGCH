@@ -69,7 +69,7 @@ export const Footer: React.FC = () => {
           <div className="text-center md:text-right text-xs text-slate-500 font-sans">
             <p className="font-semibold text-slate-700 uppercase tracking-wider text-[10px]">Sistema Certificado de Cuestionarios y Gestión</p>
             <p className="mt-1">© {new Date().getFullYear()} Gobierno del Estado de Puebla. Reservados todos los derechos oficiales.</p>
-            <p className="text-[10px] text-slate-400 mt-0.5">Estación de Trabajo Autorizada | Dirección General de Innovación Digital.</p>
+            <p className="text-[10px] text-slate-400 mt-0.5">Estación de Trabajo Autorizada | Departamento de Innovación Administrativa.</p>
           </div>
 
         </div>

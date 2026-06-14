@@ -1,0 +1,2287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plataforma de Cuestionarios y Gestión de Manuales - Gobierno de Puebla</title>
+  
+  <!-- CSS Fonts and Premium Styles -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js for Beautiful Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    // Configuración temática de Tailwind compatible con el diseño premium de Puebla
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Continuous premium marquee animation for the Talavera ribbon */
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+      display: flex;
+      width: max-content;
+      animation: marquee 35s linear infinite;
+    }
+    .animate-marquee:hover {
+      animation-play-state: paused;
+    }
+    /* Simple hide scrollbar utility */
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Webkit scrollbar for premium feel */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-900 flex flex-col relative antialiased select-none font-sans">
+
+  <!-- ==================== APARTADO 1: PANTALLA DE INGRESO (LOGIN) ==================== -->
+  <div id="login-screen" class="fixed inset-0 z-50 w-full min-h-screen flex items-center justify-center bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-[#0f172a] to-slate-950 p-4 overflow-y-auto">
+    <!-- Light decorative elements in background -->
+    <div class="absolute top-10 left-10 w-96 h-96 bg-[#C09440]/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-10 right-10 w-96 h-96 bg-[#C09440]/5 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="w-full max-w-lg z-10 my-8">
+      <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200/50">
+        <!-- Header plate with Puebla emblem and metallic slate-copper theme -->
+        <div class="relative bg-gradient-to-r from-[#0f172a] to-[#1e293b] py-8 px-6 text-white text-center">
+          <div class="absolute top-0 left-0 w-full h-[5px] bg-[#C09440]"></div>
+          
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-white/5 backdrop-blur-md rounded-2xl mb-3 shadow-inner border border-white/10">
+            <!-- SVG Puebla Shield representing state seal -->
+            <svg class="w-10 h-10 text-[#C09440]" viewBox="0 0 100 110" fill="currentColor">
+              <path d="M50 0 C40 10, 15 15, 15 45 C15 75, 35 95, 50 110 C65 95, 85 75, 85 45 C85 15, 60 10, 50 0 Z" fill="#ffffff" />
+              <path d="M50 15 L50 90 M25 45 L75 45" stroke="#1e293b" strokeWidth="6" />
+              <circle cx="50" cy="45" r="9" fill="#C09440" />
+            </svg>
+          </div>
+          
+          <h1 class="text-xl font-bold tracking-tight">Gobierno del Estado de Puebla</h1>
+          <p class="text-slate-300 text-xs tracking-wider uppercase mt-1.5 font-bold">
+            Sistema de Cuestionarios y Gestión de Manuales
+          </p>
+          <span class="inline-block mt-3.5 text-[9px] bg-[#C09440] text-slate-950 font-extrabold px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">
+            DGCH Portal Oficial
+          </span>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="p-8 space-y-6">
+          
+          <!-- Mode Selector (Operational vs Administrator) -->
+          <div class="flex bg-slate-100 p-1 rounded-xl">
+            <button type="button" id="btn-mode-user" class="flex-1 text-center py-2 text-xs font-bold rounded-lg transition-all bg-white text-slate-800 shadow-sm" onclick="setLoginMode('user')">
+              ENLACE OPERATIVO
+            </button>
+            <button type="button" id="btn-mode-admin" class="flex-1 text-center py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-800" onclick="setLoginMode('admin')">
+              ADMINISTRADOR CENTRAL
+            </button>
+          </div>
+
+          <!-- Email Field -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-widest">
+              Correo Electrónico Oficial
+            </label>
+            <div class="relative rounded-xl shadow-sm">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                </svg>
+              </div>
+              <input
+                id="login-email"
+                type="email"
+                required
+                placeholder="nombre@puebla.gob.mx"
+                class="block w-full pl-11 pr-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 focus:bg-white transition text-sm"
+              />
+            </div>
+            <p class="text-[10px] text-slate-400">Ingrese su cuenta institucional autorizada.</p>
+          </div>
+
+          <!-- Password Field (Hidden in user mode, shown in admin mode) -->
+          <div id="login-password-container" class="space-y-1.5 hidden">
+            <div class="flex items-center justify-between">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-widest">
+                Contraseña Administrativa
+              </label>
+              <span class="text-[10px] bg-red-50 text-red-700 font-extrabold px-1.5 py-0.5 rounded border border-red-200">
+                REQUERIDO
+              </span>
+            </div>
+            <div class="relative rounded-xl shadow-sm">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-red-700/60">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <input
+                id="login-password"
+                type="password"
+                placeholder="••••••••"
+                class="block w-full pl-11 pr-4 py-3 bg-red-50/10 border border-slate-200 rounded-xl text-neutral-800 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-red-500/10 focus:border-red-500 focus:bg-white transition text-sm"
+              />
+            </div>
+          </div>
+
+          <!-- Dependencia Selector (Hidden in admin mode, shown in user mode) -->
+          <div id="login-dep-container" class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-widest">
+              Dependencia o Secretaría de Adscripción
+            </label>
+            <div class="relative rounded-xl shadow-sm">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+              </div>
+              <select
+                id="login-dependency"
+                class="block w-full pl-11 pr-4 py-3 bg-slate-50/50 border border-slate-200 rounded-xl text-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 focus:bg-white transition text-sm cursor-pointer"
+              >
+                <option value="">-- Seleccione su Dependencia --</option>
+                <option value="Secretaría de Gobernación">Secretaría de Gobernación</option>
+                <option value="Secretaría de Planeación, Finanzas y Administración">Secretaría de Planeación, Finanzas y Administración</option>
+                <option value="Secretaría Anticorrupción y Buen Gobierno">Secretaría Anticorrupción y Buen Gobierno</option>
+                <option value="Secretaría de Desarrollo Económico y Trabajo">Secretaría de Desarrollo Económico y Trabajo</option>
+                <option value="Secretaría de Arte y Cultura">Secretaría de Arte y Cultura</option>
+                <option value="Secretaría de Turismo">Secretaría de Turismo</option>
+                <option value="Secretaría de Desarrollo Rural">Secretaría de Desarrollo Rural</option>
+                <option value="Secretaría de Infraestructura">Secretaría de Infraestructura</option>
+                <option value="Secretaría de Movilidad y Transporte">Secretaría de Movilidad y Transporte</option>
+                <option value="Secretaría de Salud">Secretaría de Salud</option>
+                <option value="Secretaría de Educación">Secretaría de Educación</option>
+                <option value="Secretaría de Bienestar">Secretaría de Bienestar</option>
+                <option value="Secretaría de Seguridad Pública">Secretaría de Seguridad Pública</option>
+                <option value="Secretaría de Medio Ambiente, Desarrollo Sustentable y Ordenamiento Territorial">Secretaría de Medio Ambiente, Desarrollo Sustentable y Ordenamiento Territorial</option>
+                <option value="Secretaría de las Mujeres">Secretaría de las Mujeres</option>
+                <option value="Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI)">Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI)</option>
+                <option value="Secretaría de Deporte y Juventud">Secretaría de Deporte y Juventud</option>
+                <option value="Consejería Jurídica">Consejería Jurídica</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Error Feedback Container -->
+          <div id="login-error" class="p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-800 font-medium flex items-start gap-2.5 hidden">
+            <svg class="w-4.5 h-4.5 shrink-0 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <span id="login-error-text">Las credenciales brindadas no son válidas.</span>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-[#0f172a] hover:bg-[#1e293b] text-white py-3.5 px-4 rounded-xl font-bold tracking-widest text-xs transition-all duration-300 transform active:scale-[0.98] shadow-lg shadow-slate-900/20 flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>INGRESAR AL PORTAL</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+        </form>
+
+        <div class="bg-slate-50 px-8 py-4 border-t border-slate-100 text-center text-[10px] text-slate-400 leading-relaxed uppercase tracking-wider">
+          Esta plataforma es de uso exclusivo para funcionarios públicos autorizados del Gobierno del Estado de Puebla. Toda actividad es auditada y registrada.
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- ==================== MAIN PLATFORM APP LAYOUT ==================== -->
+  <div id="app-screen" class="flex-col min-h-screen hidden">
+    
+    <!-- Header component with official logos -->
+    <header class="bg-[#0f172a] text-white border-b border-slate-800 shadow-lg relative overflow-hidden font-sans">
+      <div class="h-[4px] w-full bg-gradient-to-r from-red-700 via-[#C09440] to-slate-900"></div>
+      
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-6">
+        
+        <div class="flex flex-col text-center md:text-left select-none">
+          <span class="text-sm font-bold tracking-wider text-slate-100 uppercase">
+            Subsecretaría de Administración
+          </span>
+          <span class="text-xs text-[#C09440] font-semibold tracking-widest uppercase mt-1">
+            Dirección General de Capital Humano
+          </span>
+        </div>
+        
+        <div class="flex flex-wrap items-center justify-center gap-6">
+          <!-- Logo 1: Puebla Shield Representation -->
+          <div class="flex items-center gap-2 border-r border-slate-800 pr-4 py-1 h-12">
+            <svg class="h-10 w-9 text-[#C09440]" viewBox="0 0 100 110" fill="currentColor">
+              <path d="M50 0 C40 10, 15 15, 15 45 C15 75, 35 95, 50 110 C65 95, 85 75, 85 45 C85 15, 60 10, 50 0 Z" fill="#C09440" />
+              <path d="M50 5 C43 14, 20 18, 20 45 C20 71, 37 89, 50 102 C63 89, 80 71, 80 45 C80 18, 57 14, 50 5 Z" fill="#0f172a" />
+              <path d="M50 15 L50 90 M25 45 L75 45 M30 30 L70 65" stroke="#C09440" strokeWidth="4" />
+              <circle cx="50" cy="45" r="8" fill="#ffffff" />
+            </svg>
+            <div class="flex flex-col text-slate-100">
+              <span class="text-[10px] font-black leading-none opacity-90">GOBIERNO DEL</span>
+              <span class="text-[14px] font-extrabold tracking-tight leading-none text-white">ESTADO</span>
+              <span class="text-[8px] font-bold tracking-widest text-[#C09440] mt-0.5 leading-none">2024 - 2030</span>
+            </div>
+          </div>
+
+          <!-- Logo 2 -->
+          <div class="flex flex-col justify-center border-r border-slate-800 pr-4 h-12">
+            <span class="text-[16px] font-black text-white tracking-tight leading-none flex items-center">
+              Finanzas
+            </span>
+            <span class="text-[8px] font-semibold text-slate-400 leading-tight max-w-[130px] mt-1">
+              Secretaría de Planeación, Finanzas y Administración
+            </span>
+          </div>
+
+          <!-- Logo 3: Slogan -->
+          <div class="flex flex-col justify-center items-center border-r border-slate-800 pr-4 h-12">
+            <div class="text-[8px] font-extrabold tracking-widest text-[#C09440] uppercase leading-none">POR</div>
+            <div class="flex items-center gap-1">
+              <span class="text-[12px] font-black text-white uppercase tracking-tight">AMOR</span>
+              <svg class="w-2.5 h-2.5 text-rose-500 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+              <span class="text-[12px] font-black text-white uppercase tracking-tight">A</span>
+            </div>
+            <div class="text-[13px] font-extrabold text-[#C09440] tracking-tighter leading-none -mt-0.5 select-none">
+              PUEBLA
+            </div>
+          </div>
+
+          <!-- Logo 4: Norma Mexicana -->
+          <div class="flex items-center gap-1.5 h-12">
+            <svg class="w-8 h-8 rounded-full border border-slate-700 bg-slate-900/50" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="48" fill="none" stroke="#C09440" strokeWidth="0.5" />
+              <circle cx="50" cy="50" r="35" fill="none" stroke="#10b981" strokeWidth="1" strokeDasharray="3 3" />
+              <circle cx="50" cy="28" r="4.5" fill="#f43f5e" />
+              <circle cx="72" cy="42" r="4.5" fill="#3b82f6" />
+              <circle cx="64" cy="68" r="4.5" fill="#10b981" />
+              <circle cx="36" cy="68" r="4.5" fill="#f59e0b" />
+              <circle cx="28" cy="42" r="4.5" fill="#8b5cf6" />
+              <path d="M50 35 L50 65 M35 50 L65 50" stroke="#C09440" strokeWidth="1.2" />
+            </svg>
+            <div class="flex flex-col text-[7px] leading-tight font-sans font-bold text-slate-400 max-w-[65px] uppercase">
+              <span>Norma Mexicana</span>
+              <span class="text-emerald-400 font-extrabold">Igualdad y No</span>
+              <span class="text-rose-400">Discriminación</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Session Status Bar -->
+      <div class="bg-[#121c30] border-t border-slate-800/80 px-4 sm:px-6 lg:px-8 py-2.5">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs">
+          <div class="flex items-center gap-2.5 text-slate-300">
+            <div class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </div>
+            <span class="text-slate-400">Sesión activa: <strong id="user-display-email" class="text-emerald-300 font-medium">--</strong></span>
+            <span class="text-slate-700">|</span>
+            <span id="user-display-dept" class="uppercase text-[9px] font-extrabold px-2 py-0.5 bg-slate-800 text-slate-200 rounded border border-slate-700/60 tracking-wider">
+              --
+            </span>
+          </div>
+          
+          <div class="flex items-center gap-4 text-slate-400 font-mono text-[11px]">
+            <span id="user-display-time">Ingreso: --</span>
+            <button
+              onclick="logout()"
+              class="text-xs text-rose-400 hover:text-rose-300 font-bold flex items-center gap-1.5 transition-colors duration-150 outline-none group cursor-pointer"
+            >
+              <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+              </svg>
+              Salir del Sistema
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation tabs sub-header -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm font-sans">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex gap-3 overflow-x-auto scrollbar-hide -mb-px">
+          
+          <button 
+            id="tab-responder"
+            onclick="switchTab('responder')"
+            class="whitespace-nowrap px-4 py-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 outline-none cursor-pointer border-[#C09440] text-slate-900 font-extrabold"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>Responder</span>
+          </button>
+
+          <button 
+            id="tab-analytics"
+            onclick="switchTab('analytics')"
+            class="whitespace-nowrap px-4 py-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 outline-none cursor-pointer border-transparent text-slate-500 hover:text-slate-900"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span>Analytics</span>
+          </button>
+
+          <button 
+            id="tab-solventaciones"
+            onclick="switchTab('solventaciones')"
+            class="whitespace-nowrap px-4 py-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 outline-none cursor-pointer border-transparent text-slate-500 hover:text-slate-900"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Solventaciones</span>
+          </button>
+
+          <button 
+            id="tab-archivos"
+            onclick="switchTab('archivos')"
+            class="whitespace-nowrap px-4 py-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 outline-none cursor-pointer border-transparent text-slate-500 hover:text-slate-900"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span>Archivos</span>
+          </button>
+
+          <!-- Admin exclusive tabs -->
+          <button 
+            id="tab-usuarios"
+            onclick="switchTab('usuarios')"
+            class="whitespace-nowrap px-4 py-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 outline-none cursor-pointer border-transparent text-slate-500 hover:text-slate-900 hidden"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            <span>Usuarios</span>
+          </button>
+
+          <button 
+            id="tab-config"
+            onclick="switchTab('config')"
+            class="whitespace-nowrap px-4 py-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 outline-none cursor-pointer border-transparent text-slate-500 hover:text-slate-900 hidden"
+          >
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>Configurar</span>
+          </button>
+
+        </div>
+      </div>
+    </nav>
+
+
+
+
+    <!-- ==================== TAB CONTENT AREAS ==================== -->
+    <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 font-sans">
+      
+      <!-- TAB 1: RESPONDER -->
+      <section id="pane-responder" class="tab-pane">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <!-- Ribbon -->
+          <div class="bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 px-6 sm:px-8 py-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 class="text-base font-bold text-slate-800 tracking-tight uppercase">Cuestionario de Diagnóstico y Cumplimiento</h2>
+              <p class="text-[11px] text-slate-500 mt-0.5">Control Interno sobre la Elaboración, Dictaminación y Vigencia de Manuales Administrativos</p>
+            </div>
+            <button
+              type="button"
+              onclick="generarFolioLocal()"
+              class="bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold py-2 px-3.5 rounded-xl transition border border-slate-200 flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer"
+            >
+              <svg class="w-4 h-4 text-[#C09440]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Generar Folio de Trámite
+            </button>
+          </div>
+
+          <!-- Alert banner -->
+          <div id="submit-alert" class="m-6 sm:m-8 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 font-semibold flex items-center gap-2.5 hidden">
+            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span id="submit-alert-msg">¡Trámite guardado correctamente!</span>
+          </div>
+
+          <!-- Form elements -->
+          <form id="responder-form" onsubmit="saveCuestionario(event)" class="p-6 sm:p-8 space-y-8">
+            
+            <!-- Metadata Area -->
+            <div class="bg-slate-50/55 rounded-2xl p-5 border border-slate-200/60">
+              <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">A. Datos Generales de Registro</h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Ejercicio Fiscal</label>
+                  <select id="r-ejercicio" required class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2 text-sm text-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 cursor-pointer">
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                    <option value="2029">2029</option>
+                  </select>
+                </div>
+
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Folio de Control Interno</label>
+                  <input id="r-folio" type="text" required placeholder="E.g., MOG-DGCH-2026-001" class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2 text-sm text-slate-800 font-mono tracking-wider focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 placeholder-slate-300" />
+                </div>
+
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Tipo de Documento / Manual</label>
+                  <select id="r-tipo" required class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2 text-sm text-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 cursor-pointer">
+                    <option value="MANUAL DE ORGANIZACIÓN">MANUAL DE ORGANIZACIÓN (MOG)</option>
+                    <option value="MANUAL DE PROCEDIMIENTOS">MANUAL DE PROCEDIMIENTOS (MAP)</option>
+                    <option value="MANUAL DE SERVICIOS AL PUBLICO">MANUAL DE SERVICIOS AL PÚBLICO (MSP)</option>
+                    <option value="REGLAMENTO INTERNO">REGLAMENTO INTERNO</option>
+                    <option value="ESTRUCTURA ORGÁNICA">ESTRUCTURA ORGÁNICA</option>
+                  </select>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- The Questions -->
+            <div class="space-y-8">
+              <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-200 pb-2">B. Cuestiones Diagnósticas de Control</h3>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                
+                <!-- Q1 -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-slate-800">1. ¿Quién es el enlace designado oficialmente para la elaboración de manuales en su dependencia?</label>
+                  <input id="q1" type="text" required placeholder="Nombre, puesto y correo de contacto..." class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900" />
+                </div>
+
+                <!-- Q2 -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-slate-800">2. ¿Tiene dudas o inquietudes particulares sobre la metodología de la Dirección de Capital Humano?</label>
+                  <textarea id="q2" rows="2" placeholder="Describa si requiere asesoría o capacitación metodológica..." class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900"></textarea>
+                </div>
+
+                <!-- Q3 -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-slate-800">3. ¿Cuál es su principal obstáculo al redactar la redacción del objetivo y el alcance de un procedimiento?</label>
+                  <textarea id="q3" rows="2" placeholder="E.g., Alineación a metas, redacción de verbos en infinitivo, etc..." class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900"></textarea>
+                </div>
+
+                <!-- Q4 -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-slate-800">4. En el último periodo de observaciones de la DGCH, ¿cuántos días tardó aproximadamente en solventar?</label>
+                  <input id="q4" type="text" required placeholder="E.g., 5 días hábiles, aún sin observaciones..." class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900" />
+                </div>
+
+                <!-- Q5 -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-slate-800">5. ¿Cuáles son las discrepancias actuales en la estructura de puestos (Validados vs Autorizados)?</label>
+                  <textarea id="q5" rows="2" placeholder="Reporte si cuenta con puestos transitorios sin validar..." class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900"></textarea>
+                </div>
+
+                <!-- Q6 -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-slate-800">6. ¿Con cuántos procedimientos vigentes cuenta su Dirección General que urjan actualización?</label>
+                  <input id="q6" type="text" placeholder="E.g., 12 procedimientos de los cuales 4 son críticos..." class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900" />
+                </div>
+
+                <!-- Q7 -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-slate-800">7. ¿Cuenta el área con Reglamento Interior debidamente publicado y vigente en el Periódico Oficial?</label>
+                  <select id="q7" class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 cursor-pointer">
+                    <option value="Sí, actualizado y publicado en Periódico Oficial">Sí, actualizado y publicado en Periódico Oficial</option>
+                    <option value="Sí, pero requiere actualización estructural">Sí, pero requiere actualización estructural</option>
+                    <option value="No contamos con reglamento formal publicado">No contamos con reglamento formal publicado</option>
+                    <option value="En proceso de dictaminación jurídica">En proceso de dictaminación jurídica</option>
+                  </select>
+                </div>
+
+                <!-- Q8 -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-slate-800">8. Identifique los mayores 'cuellos de botella' en el proceso de revisión metodológica interna:</label>
+                  <textarea id="q8" rows="2" placeholder="Falta de firmas, cambios de titular, demoras metodológicas..." class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900"></textarea>
+                </div>
+
+                <!-- Q9 -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-slate-800">9. ¿El personal operativo a su cargo conoce plenamente la Visión y Misión institucional?</label>
+                  <input id="q9" type="text" placeholder="Porcentaje de conocimiento o estrategia de difusión..." class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900" />
+                </div>
+
+                <!-- Q10 -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-slate-800">10. ¿Cuál es la frecuencia común de revisión técnica de sus procesos de operación interna?</label>
+                  <select id="q10" class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 cursor-pointer">
+                    <option value="Anual">Anual</option>
+                    <option value="Cada 2 años">Cada 2 años</option>
+                    <option value="Frecuencia variable">Frecuencia variable</option>
+                    <option value="Por contingencia u ordenación legal">Por contingencia u ordenación legal</option>
+                  </select>
+                </div>
+
+                <!-- Q11 -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-slate-800">11. ¿Qué porcentaje aproximado de los manuales del área se encuentran digitalizados y en intranet?</label>
+                  <select id="q11" class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 cursor-pointer">
+                    <option value="Menos de 25%">Menos de 25% (Proceso inicial)</option>
+                    <option value="Entre 25% y 50%">Entre 25% y 50%</option>
+                    <option value="Entre 50% y 75%">Entre 50% y 75%</option>
+                    <option value="Más de 75%">Más de 75% (Óptimo digital)</option>
+                  </select>
+                </div>
+
+                <!-- Q12 -->
+                <div class="space-y-2">
+                  <label class="block text-sm font-semibold text-slate-800">12. ¿Cuáles son sus propuestas de mejora o comentarios adicionales para agilizar este proceso de control?</label>
+                  <textarea id="q12" rows="2" placeholder="Anotaciones complementarias o propuestas técnicas..." class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900"></textarea>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Submit buttons row -->
+            <div class="flex justify-end gap-3 pt-6 border-t border-slate-200">
+              <button 
+                type="button" 
+                onclick="clearForm()"
+                class="px-5 py-2.5 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 font-bold text-xs cursor-pointer"
+              >
+                LIMPIAR BORRADOR
+              </button>
+              <button 
+                type="submit" 
+                class="px-6 py-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-white rounded-xl font-bold text-sm tracking-wider shadow-sm hover:shadow-md transition-all duration-150 transform active:scale-95 cursor-pointer"
+              >
+                GUARDAR REGISTRO OFICIAL
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </section>
+
+
+
+
+      <!-- TAB 2: ANALYTICS -->
+      <section id="pane-analytics" class="tab-pane hidden">
+        <div class="space-y-8 animate-fade">
+          
+          <!-- Key metrics widgets -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center justify-between">
+              <div>
+                <p class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Total Trámites</p>
+                <p id="stat-total" class="text-3xl font-extrabold text-[#0f172a] mt-1">0</p>
+                <p class="text-[10px] text-neutral-500 mt-1">Registrados colectores</p>
+              </div>
+              <div class="p-3.5 bg-neutral-100 rounded-xl text-neutral-600">
+                <svg class="w-6 h-6 text-[#C09440]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center justify-between">
+              <div>
+                <p class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Solventaciones</p>
+                <p id="stat-solventadas" class="text-3xl font-extrabold text-emerald-700 mt-1">0</p>
+                <p class="text-[10px] text-neutral-500 mt-1">Dictámenes concluidos</p>
+              </div>
+              <div class="p-3.5 bg-emerald-50 rounded-xl text-emerald-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center justify-between">
+              <div>
+                <p class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Procedimiento (MAP)</p>
+                <p id="stat-map" class="text-3xl font-extrabold text-blue-950 mt-1">0</p>
+                <p class="text-[10px] text-neutral-500 mt-1">Modelos de operación</p>
+              </div>
+              <div class="p-3.5 bg-blue-50 rounded-xl text-blue-900">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center justify-between">
+              <div>
+                <p class="text-xs font-bold text-neutral-400 uppercase tracking-widest">Organización (MOG)</p>
+                <p id="stat-mog" class="text-3xl font-extrabold text-[#0f172a] mt-1">0</p>
+                <p class="text-[10px] text-neutral-500 mt-1">Estructuras oficiales</p>
+              </div>
+              <div class="p-3.5 bg-slate-100 rounded-xl text-slate-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Charts and Tables -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 lg:col-span-1">
+              <h4 class="font-bold text-sm text-neutral-800 uppercase tracking-wider mb-4">Métricas por Tipo de Trámite</h4>
+              <div class="relative h-64 w-full flex justify-center items-center">
+                <canvas id="diagnostics-chart"></canvas>
+              </div>
+              
+              <div class="space-y-3.5 mt-6">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="flex items-center gap-1.5 font-medium"><span class="w-2.5 h-2.5 rounded-full bg-[#0f172a]"></span>MOG</span>
+                  <span id="label-mog-count" class="font-bold">0</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="flex items-center gap-1.5 font-medium"><span class="w-2.5 h-2.5 rounded-full bg-[#10b981]"></span>MAP</span>
+                  <span id="label-map-count" class="font-bold">0</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="flex items-center gap-1.5 font-medium"><span class="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></span>Otros / Estructura</span>
+                  <span id="label-other-count" class="font-bold">0</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Filters Data Grid -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 lg:col-span-2 space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <h4 class="font-bold text-sm text-neutral-800 uppercase tracking-wider">Historial de Folios Tramitados</h4>
+                
+                <!-- Search -->
+                <div class="relative w-full sm:w-64">
+                  <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                  </span>
+                  <input
+                    id="table-search"
+                    oninput="filterHistorialTable()"
+                    placeholder="Buscar folio, depto..."
+                    class="w-full pl-9 pr-4 py-1.5 text-xs bg-white rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 text-slate-800"
+                  />
+                </div>
+              </div>
+
+              <!-- Filter bars -->
+              <div class="flex flex-wrap gap-2">
+                <select id="filter-ejercicio" onchange="filterHistorialTable()" class="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-xl text-slate-800 outline-none cursor-pointer">
+                  <option value="All">Todos los ejercicios</option>
+                  <option value="2026">2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                  <option value="2029">2029</option>
+                </select>
+
+                <select id="filter-tipo" onchange="filterHistorialTable()" class="px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-xl text-slate-800 outline-none cursor-pointer">
+                  <option value="All">Todos los tipos de manual</option>
+                  <option value="MANUAL DE ORGANIZACIÓN">MANUAL DE ORGANIZACIÓN (MOG)</option>
+                  <option value="MANUAL DE PROCEDIMIENTOS">MANUAL DE PROCEDIMIENTOS (MAP)</option>
+                  <option value="MANUAL DE SERVICIOS AL PUBLICO">MANUAL DE SERVICIOS AL PÚBLICO (MSP)</option>
+                  <option value="REGLAMENTO INTERNO">REGLAMENTO INTERNO</option>
+                  <option value="ESTRUCTURA ORGÁNICA">ESTRUCTURA ORGÁNICA</option>
+                </select>
+              </div>
+
+              <!-- The Table -->
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-100">
+                  <thead class="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                    <tr>
+                      <th class="px-4 py-3 text-left">Folio</th>
+                      <th class="px-4 py-3 text-left">Ejercicio</th>
+                      <th class="px-4 py-3 text-left">Tipo</th>
+                      <th class="px-4 py-3 text-left">Dependencia</th>
+                      <th class="px-4 py-3 text-left">Estado</th>
+                      <th class="px-4 py-3 text-right">Respuestas / Detalle</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historial-tbody" class="divide-y divide-slate-100 text-xs text-slate-600">
+                    <!-- Dynamic Rows -->
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+
+
+
+      <!-- TAB 3: SOLVENTACIONES -->
+      <section id="pane-solventaciones" class="tab-pane hidden">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="px-6 py-5 border-b border-slate-200">
+            <h3 class="font-bold text-base text-slate-800 uppercase tracking-tight">Módulo de Solventaciones Metodológicas</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Enmiendas y fundamentación técnica sobre las observaciones del diagnóstico de manuales.</p>
+          </div>
+
+          <div class="p-6 overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-100">
+              <thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                <tr>
+                  <th class="px-6 py-3 text-left">Folio Interno</th>
+                  <th class="px-6 py-3 text-left">Dependencia</th>
+                  <th class="px-6 py-3 text-left">Tipo</th>
+                  <th class="px-6 py-3 text-left">Estatus Técnico</th>
+                  <th class="px-6 py-3 text-right">Acción Oficial</th>
+                </tr>
+              </thead>
+              <tbody id="solventaciones-tbody" class="divide-y divide-slate-100 text-xs">
+                <!-- Dynamically Rendered Rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+
+
+
+      <!-- TAB 4: ARCHIVOS REPOSITORIO -->
+      <section id="pane-archivos" class="tab-pane hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          <!-- Upload Widget Panel -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-6 space-y-6 h-fit">
+            <div>
+              <h3 class="font-bold text-sm text-neutral-800 uppercase tracking-wider">Cargar Manuales o Anexos</h3>
+              <p class="text-[11px] text-neutral-400 mt-0.5">Cargue los archivos respaldatorios firmados para validación de la DGCH.</p>
+            </div>
+
+            <div 
+              id="drop-zone"
+              ondragover="handleDragOver(event)"
+              ondragleave="handleDragLeave(event)"
+              ondrop="handleDrop(event)"
+              onclick="triggerFileInput()"
+              class="border-2 border-dashed border-slate-200 hover:border-slate-900 rounded-2xl p-6 text-center transition-all cursor-pointer flex flex-col items-center justify-center bg-slate-50/50"
+            >
+              <input type="file" id="file-uploader" class="hidden" onchange="handleFileSelect(event)" />
+              
+              <!-- Icon -->
+              <svg class="w-10 h-10 text-[#C09440] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+
+              <p class="text-xs font-bold text-neutral-800 uppercase tracking-wider">Depositar Archivos</p>
+              <p class="text-[10px] text-neutral-400 mt-1">Arrastre o haga clic para examinar</p>
+              <p class="text-[9px] text-[#C09440] font-black uppercase mt-3">PDF, DOCX, XLSX o PNG hasta 25MB</p>
+            </div>
+
+            <!-- File Upload progress simulator -->
+            <div id="progress-list" class="space-y-3">
+              <!-- Progress Bars go here -->
+            </div>
+          </div>
+
+          <!-- Repository List Panel -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-6 lg:col-span-2 space-y-4">
+            <div class="flex items-center justify-between mb-4 pb-2 border-b border-neutral-100">
+              <h3 class="font-bold text-sm text-neutral-800 uppercase tracking-wider">Repositorio del Trámite</h3>
+              <span id="repo-count-label" class="text-[10px] font-bold bg-slate-100 text-slate-800 px-2.5 py-0.5 rounded-full uppercase border border-slate-200">
+                0 Documentos
+              </span>
+            </div>
+
+            <div id="repo-empty-state" class="text-center py-12 text-slate-400">
+              <svg class="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p class="text-xs font-semibold">No se han subido documentos de respaldo</p>
+              <p class="text-[10px] text-slate-400 mt-0.5">Use el panel lateral para cargar el primer archivo</p>
+            </div>
+
+            <div id="repo-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+              <!-- Dynamically populated files -->
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+
+
+      <!-- TAB 5: usuarios (ADMIN ONLY) -->
+      <section id="pane-usuarios" class="tab-pane hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div class="px-6 py-5 border-b border-slate-200">
+            <h3 class="font-bold text-base text-slate-800 uppercase tracking-tight">Administración de Enlaces y Funcionarios</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Gestión de privilegios y credenciales del personal habilitado para las representaciones de cada Secretaría.</p>
+          </div>
+
+          <div class="p-6">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-slate-100">
+                <thead class="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                  <tr>
+                    <th class="px-6 py-3 text-left">Funcionario</th>
+                    <th class="px-6 py-3 text-left">Dependencia / Sector</th>
+                    <th class="px-6 py-3 text-left">Rol de Sistema</th>
+                    <th class="px-6 py-3 text-right">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="usuarios-tbody" class="divide-y divide-slate-100 text-xs">
+                  <!-- Custom user rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+
+
+      <!-- TAB 6: CONFIGURAR (ADMIN ONLY) -->
+      <section id="pane-config" class="tab-pane hidden">
+        <div class="bg-white rounded-2xl border border-slate-200 p-8 space-y-6">
+          <div>
+            <h3 class="font-bold text-base text-slate-800 uppercase tracking-tight">Configuración del Control de Plazos</h3>
+            <p class="text-xs text-slate-400 mt-0.5">Parámetros globales de la Subsecretaría de Administración para la vigencia del período fiscal en curso.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-slate-100">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Periodo Plenario Oficial</label>
+              <input type="text" value="Primer Periodo - Convocatoria 2026" class="w-full bg-slate-50 rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none" disabled />
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Límite de Días para Solventar</label>
+              <input type="number" value="15" class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900" />
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Estado Técnico Regulatorio</label>
+              <select class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 cursor-pointer">
+                <option value="activo">Fase de Captura e Ingreso Metodológico (Abierto)</option>
+                <option value="cerrado">Fase de Dictamen y Suspensión Temporal (Cerrado)</option>
+              </select>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Notificaciones Directas por Correo</label>
+              <div class="flex items-center gap-3 mt-3">
+                <input type="checkbox" checked class="w-4.5 h-4.5 text-[#C09440] border-slate-300 rounded focus:ring-[#C09440]" />
+                <span class="text-xs text-slate-600 font-medium font-sans">Enviar alertas automáticas a Enlaces Operativos al detectar observaciones en manuales</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-4 border-t border-slate-100">
+            <button onclick="alert('Configuración guardada correctamente.')" class="px-6 py-2.5 bg-[#0f172a] hover:bg-[#1e293b] text-white rounded-xl font-bold text-xs tracking-widest cursor-pointer">
+              GUARDAR CAMBIOS CONFIGURATIVOS
+            </button>
+          </div>
+        </div>
+
+        <!-- SECCIÓN DE RESPONSABILIDAD: ALERTAS POR DEPENDENCIA -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-8 space-y-6 mt-8 font-sans">
+          <div class="border-b border-slate-100 pb-4">
+            <div class="flex items-center gap-2">
+              <span class="p-1.5 bg-[#C09440]/10 rounded-lg text-[#C09440] inline-block">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+              </span>
+              <h3 class="font-bold text-base text-slate-800 uppercase tracking-tight">Programación de Alertas Preventivas de Solventación</h3>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Defina qué email enlace operativo recibirá los recordatorios oficiales cada cuántos días hábiles para solventar observaciones pendientes.</p>
+          </div>
+
+          <!-- Alert Formulation Grid -->
+          <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200/50 space-y-4">
+            <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-wider">Nueva Alerta Preventiva</h4>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="space-y-1.5">
+                <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider">Dependencia / Secretaría</label>
+                <select id="cfg-alert-dep" onchange="autoPopulateEmail()" class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 cursor-pointer">
+                  <option value="Secretaría de Gobernación">Secretaría de Gobernación</option>
+                  <option value="Secretaría de Planeación, Finanzas y Administración">Secretaría de Planeación, Finanzas y Administración</option>
+                  <option value="Secretaría Anticorrupción y Buen Gobierno">Secretaría Anticorrupción y Buen Gobierno</option>
+                  <option value="Secretaría de Desarrollo Económico y Trabajo">Secretaría de Desarrollo Económico y Trabajo</option>
+                  <option value="Secretaría de Arte y Cultura">Secretaría de Arte y Cultura</option>
+                  <option value="Secretaría de Turismo">Secretaría de Turismo</option>
+                  <option value="Secretaría de Desarrollo Rural">Secretaría de Desarrollo Rural</option>
+                  <option value="Secretaría de Infraestructura">Secretaría de Infraestructura</option>
+                  <option value="Secretaría de Movilidad y Transporte">Secretaría de Movilidad y Transporte</option>
+                  <option value="Secretaría de Salud">Secretaría de Salud</option>
+                  <option value="Secretaría de Educación">Secretaría de Educación</option>
+                  <option value="Secretaría de Bienestar">Secretaría de Bienestar</option>
+                  <option value="Secretaría de Seguridad Pública">Secretaría de Seguridad Pública</option>
+                  <option value="Secretaría de Medio Ambiente, Desarrollo Sustentable y Ordenamiento Territorial">Secretaría de Medio Ambiente, Desarrollo Sustentable y Ordenamiento Territorial</option>
+                  <option value="Secretaría de las Mujeres">Secretaría de las Mujeres</option>
+                  <option value="Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI)">Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI)</option>
+                  <option value="Secretaría de Deporte y Juventud">Secretaría de Deporte y Juventud</option>
+                  <option value="Consejería Jurídica">Consejería Jurídica</option>
+                </select>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider">Correo Electrónico del Enlace</label>
+                <input id="cfg-alert-email" type="email" placeholder="enlace@puebla.gob.mx" value="finanzas.enlace@puebla.gob.mx" class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-805 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 font-mono" />
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wider">Frecuencia de Notificación</label>
+                <select id="cfg-alert-freq" class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 cursor-pointer">
+                  <option value="1">Diario (Cada 1 día)</option>
+                  <option value="2">Cada 2 días hábiles</option>
+                  <option value="3" selected>Cada 3 días hábiles</option>
+                  <option value="5">Cada 5 días hábiles</option>
+                  <option value="7">Cada semana (7 días)</option>
+                  <option value="10">Cada 10 días hábiles</option>
+                  <option value="15">Cada quincena (15 días)</option>
+                  <option value="30">Cada mes (30 días)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex justify-end pt-2">
+              <button onclick="addScheduledAlert()" class="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#C09440] hover:bg-[#A67E33] text-white rounded-xl font-bold text-xs tracking-wider uppercase transition shadow-sm active:scale-95 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>Programar Nueva Alerta</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Table of Programmed Alerts -->
+          <div class="space-y-3">
+            <div class="flex justify-between items-center border-b border-slate-150 pb-2">
+              <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-wider">Alertas Activas Calendarizadas</h4>
+              <span class="text-[10px] font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 px-2 py-0.5 rounded-full" id="alerts-count-badge">2 activas</span>
+            </div>
+            
+            <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-xs">
+              <table class="min-w-full divide-y divide-slate-150">
+                <thead class="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                  <tr>
+                    <th class="px-4 py-3 text-left">Dependencia u Organismo</th>
+                    <th class="px-4 py-3 text-left">Correo de Contacto</th>
+                    <th class="px-4 py-3 text-center">Frecuencia</th>
+                    <th class="px-4 py-3 text-center">Estado</th>
+                    <th class="px-4 py-3 text-right">Acciones de Control</th>
+                  </tr>
+                </thead>
+                <tbody id="alerts-tbody" class="divide-y divide-slate-100 text-xs text-slate-600 bg-white">
+                  <!-- Dynamic Rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+
+
+
+    <!-- ==================== SOLVENTACIONES DIALOG MODAL ==================== -->
+    <div id="solventar-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs hidden">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl border border-slate-100 overflow-hidden relative">
+        
+        <!-- Top Golden line and modal header -->
+        <div class="relative bg-gradient-to-r from-[#0f172a] to-[#1e293b] text-white px-6 py-5">
+          <div class="absolute top-0 left-0 w-full h-[5px] bg-[#C09440]"></div>
+          <span class="text-[10px] bg-white/10 px-2.5 py-0.5 rounded-full font-mono uppercase tracking-widest font-bold">
+            FOLIO DE TRÁMITE: <span id="modal-folio-display">--</span>
+          </span>
+          <h4 class="text-base font-bold mt-1.5">Desahogo Metodológico y Solventación</h4>
+          <p class="text-[11px] text-slate-300 mt-0.5">Someter justificación de cumplimiento técnico ante los dictaminadores centrales de finanzas.</p>
+        </div>
+
+        <!-- Form Modal Area -->
+        <form id="solventar-form" onsubmit="submitSolventacion(event)" class="p-6 space-y-4">
+          <input type="hidden" id="modal-cuestionario-id" />
+          
+          <div class="space-y-1">
+            <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dependencia o Secretaría</span>
+            <span id="modal-dept-display" class="block text-xs font-semibold text-slate-700 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200/50">--</span>
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-widest leading-none">Argumentación y Cambios de Subsanación</label>
+            <textarea
+              id="modal-text-input"
+              rows="4"
+              required
+              placeholder="Describa pormenorizadamente los cambios y las correcciones del manual conforme la metodología oficial o la motivación técnica..."
+              class="w-full bg-white rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs focus:ring-4 focus:ring-slate-900/10 focus:border-slate-900 text-neutral-800 outline-none"
+            ></textarea>
+            <p class="text-[9px] text-slate-400">Su solventación será registrada en tiempo real con firma pública e histórica de su clave.</p>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex justify-end gap-2.5 pt-4 border-t border-slate-100">
+            <button
+              type="button"
+              onclick="closeSolventarModal()"
+              class="px-4 py-2 border border-slate-200 rounded-xl text-neutral-600 hover:bg-slate-50 font-bold text-xs cursor-pointer"
+            >
+              REGRESAR
+            </button>
+            <button
+              type="submit"
+              class="px-5 py-2 bg-[#0f172a] hover:bg-[#1e293b] text-white rounded-xl font-bold text-xs shadow-md transition-transform transform active:scale-95 cursor-pointer"
+            >
+              REGISTRAR SOLVENTACIÓN
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+
+
+
+    <!-- ==================== RESPUESTAS DIALOG MODAL ==================== -->
+    <div id="respuestas-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm hidden">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl border border-slate-100 overflow-hidden relative flex flex-col max-h-[90vh]">
+        
+        <!-- Top Golden line and modal header -->
+        <div class="relative bg-gradient-to-r from-[#0f172a] to-[#1e293b] text-white px-6 py-5 shrink-0">
+          <div class="absolute top-0 left-0 w-full h-[5px] bg-[#C09440]"></div>
+          <span class="text-[10px] bg-white/10 px-2.5 py-0.5 rounded-full font-mono uppercase tracking-widest font-bold">
+            EXPEDIENTE DE RESPUESTAS: <span id="respuestas-folio-display">--</span>
+          </span>
+          <h4 class="text-base font-bold mt-1.5 font-sans">Expediente de Cuestionario de Diagnóstico de Control</h4>
+          <p class="text-[11px] text-slate-300 mt-0.5">Respuestas oficiales capturadas por el enlace operativo para sustento metodológico.</p>
+          <button onclick="closeRespuestasModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white transition text-2xl" aria-label="Cerrar modal">&times;</button>
+        </div>
+
+        <!-- Scrollable Answers Container -->
+        <div class="p-6 overflow-y-auto space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 font-sans">
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Procedencia / Dependencia</span>
+              <span id="respuestas-dept-display" class="text-xs font-bold text-slate-800">--</span>
+            </div>
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Usuario Capturista / Fecha</span>
+              <span id="respuestas-user-display" class="text-xs font-bold text-slate-800">--</span>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <h5 class="text-xs font-bold text-[#C09440] uppercase tracking-wider border-b border-slate-100 pb-1 font-sans">Cuestiones y Respuestas de Control Técnico</h5>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="respuestas-questions-grid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="flex justify-end gap-2.5 p-4 border-t border-slate-100 bg-slate-50 shrink-0">
+          <button
+            type="button"
+            onclick="closeRespuestasModal()"
+            class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs shadow-md transition cursor-pointer uppercase tracking-wider font-sans"
+          >
+            Cerrar Expediente
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+
+
+
+    <!-- ==================== EMAIL SIMULATION MODAL ==================== -->
+    <div id="email-sim-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+      <div class="bg-[#f3f4f6] rounded-2xl shadow-2xl w-full max-w-2xl border border-slate-200 overflow-hidden relative flex flex-col max-h-[90vh]">
+        
+        <!-- Header simulating browser email client -->
+        <div class="bg-slate-800 text-slate-200 px-5 py-3.5 flex items-center justify-between shrink-0 font-mono text-[11px]">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-yellow-400 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+            <span class="text-slate-400 font-bold ml-1">Simulación de Correo Saliente Oficial (Puebla SRE / DGCH)</span>
+          </div>
+          <button onclick="closeEmailSimModal()" class="text-slate-400 hover:text-white font-sans text-lg">&times;</button>
+        </div>
+
+        <div class="bg-white p-4 border-b border-slate-200 text-xs space-y-2 shrink-0 font-sans">
+          <div><strong class="text-slate-500">De:</strong> <span class="font-mono text-slate-800 font-bold">dgch.control@puebla.gob.mx</span></div>
+          <div><strong class="text-slate-500">Para:</strong> <span id="email-sim-to" class="font-mono text-slate-800 font-bold">--</span></div>
+          <div><strong class="text-slate-500">Asunto:</strong> <span id="email-sim-subject" class="font-bold text-slate-900">--</span></div>
+        </div>
+
+        <!-- Email Body simulating corporate Puebla template -->
+        <div class="p-8 overflow-y-auto bg-slate-50 flex-1">
+          <div class="bg-white max-w-lg mx-auto border border-slate-200/85 rounded-xl shadow-xs overflow-hidden font-sans">
+            
+            <!-- Puebla Header plate -->
+            <div class="bg-[#0f172a] text-white p-6 border-b-4 border-[#C09440] relative">
+              <span class="text-[9px] uppercase tracking-wider font-extrabold bg-[#C09440] text-slate-950 px-2.5 py-0.5 rounded-full">DIRECCIÓN GENERAL DE CAPITAL HUMANO</span>
+              <h3 class="text-sm font-bold mt-2">NOTIFICACIÓN PREVENTIVA DE SOLVENTACIÓN</h3>
+              <p class="text-[10px] text-slate-400">Control de Plazos y Vigencia de Manuales Administrativos 2026</p>
+            </div>
+
+            <!-- Email Text -->
+            <div class="p-6 space-y-4 text-xs text-slate-700 leading-relaxed">
+              <p>Estimado Enlace Operativo de la <strong id="email-sim-body-dept" class="text-slate-900 uppercase">--</strong>,</p>
+              
+              <p>Esperamos que se encuentre bien. A través de este medio oficial, la <strong>Subsecretaría de Administración</strong> le notifica que se ha programado un recordatorio automático recurrente para su secretaría.</p>
+              
+              <div class="bg-slate-50 p-3.5 rounded-lg border border-slate-200/60 font-medium space-y-1">
+                <div>📌 <strong>Frecuencia programada:</strong> Alerta automática cada <span id="email-sim-body-days">--</span> días.</div>
+                <div>📅 <strong>Próximo envío programado:</strong> En <span id="email-sim-body-next">--</span> días hábiles.</div>
+                <div>👤 <strong>Destinatario principal:</strong> <span id="email-sim-body-to" class="font-mono">--</span></div>
+              </div>
+
+              <p>Se le solicita revisar urgentemente el <strong>Módulo de Solventaciones</strong> para subsanar los cuestionarios con estado <strong>PENDIENTE</strong>, cargando además sus correspondientes anexos oficiales firmados (MOG, MAP, REGL), a fin de evitar penalizaciones técnicas en el dictamen final estructural.</p>
+              
+              <p class="pt-2 border-t border-slate-100 text-[10px] text-slate-400">
+                Atentamente,<br>
+                <strong>Unidad Central de Normatividad y Estructuras DGCH</strong><br>
+                Gobierno del Estado de Puebla • 2024-2030
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Email Client Footer -->
+        <div class="bg-slate-100 px-6 py-4 border-t border-slate-200 flex justify-between items-center shrink-0 font-sans">
+          <span class="text-[10px] text-slate-400 font-mono">Estado: Enviado exitosamente (Simulador de Red SMTP Puebla)</span>
+          <button
+            onclick="closeEmailSimModal()"
+            class="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition uppercase tracking-wider cursor-pointer font-sans"
+          >
+            Entendido
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+
+
+
+    <!-- ==================== PREMIUM FOOTER AND MARQUEE WATERMARK ==================== -->
+    <footer class="bg-slate-50 border-t border-slate-200 py-6 mt-12 w-full relative font-sans">
+      <!-- Decorative Talavera tile strip as running watermark -->
+      <div class="w-full bg-slate-100/80 border-b border-t border-slate-200/50 py-1 mb-6 overflow-hidden flex items-center justify-between gap-1 select-none">
+        <div class="flex gap-2 items-center justify-center w-full animate-marquee">
+          <!-- Repeatable flowers simulating Talavera authentic designs -->
+          <div class="flex gap-4">
+            <div class="flex gap-8 items-center text-slate-300">
+              <!-- Inline Talavera Motif -->
+              <span class="inline-flex gap-8">
+                <!-- Motif item -->
+                <span class="flex items-center gap-1.5 opacity-40 text-slate-400 hover:opacity-100 transition-opacity">
+                  <svg class="w-7 h-7" viewBox="0 0 100 100" fill="currentColor">
+                    <rect x="42" y="42" width="16" height="16" transform="rotate(45 50 50)" fill="#C09440" />
+                    <circle cx="50" cy="50" r="4" fill="#f8fafc" />
+                    <path d="M50 15 C40 25, 40 40, 50 40 C60 40, 60 25, 50 15 Z" fill="#475569" />
+                    <path d="M50 85 C40 75, 40 60, 50 60 C60 60, 60 75, 50 85 Z" fill="#475569" />
+                    <path d="M15 50 C25 40, 40 40, 40 50 C40 60, 25 60, 15 50 Z" fill="#475569" />
+                    <path d="M85 50 C75 40, 60 40, 60 50 C60 60, 75 60, 85 50 Z" fill="#475569" />
+                  </svg>
+                  <span class="text-[8px] font-bold tracking-widest">TALAVERA ORIGINAL</span>
+                </span>
+              </span>
+            </div>
+          </div>
+          <!-- Repeater sequence for uninterrupted layout -->
+          <div class="flex gap-12 pr-12">
+            <span class="flex gap-8 text-slate-400 font-bold text-[8px] tracking-widest opacity-35 uppercase">
+              • SUBSECRETARÍA DE ADMINISTRACIÓN • VALOR OFICIAL • PATRIMONIO DE PUEBLA • SFP CERTIFICACIÓN • INNOVACIÓN DIGITAL • CAPACITACIÓN INTEGRAL DGCH
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2 border-r border-slate-200 pr-4">
+            <svg class="h-8 w-7 text-[#C09440]" viewBox="0 0 100 110" fill="currentColor">
+              <path d="M50 0 C40 10, 15 15, 15 45 C15 75, 35 95, 50 110 C65 95, 85 75, 85 45 C85 15, 60 10, 50 0 Z" fill="#C09440" />
+              <path d="M50 5 C43 14, 20 18, 20 45 C20 71, 37 89, 50 102 C63 89, 80 71, 80 45 C80 18, 57 14, 50 5 Z" fill="#f8fafc" />
+              <path d="M50 15 L50 90 M25 45 L75 45" stroke="#475569" strokeWidth="4" />
+              <circle cx="50" cy="45" r="8" fill="#C09440" />
+            </svg>
+            <div class="flex flex-col text-[#475569]">
+              <span class="text-[9px] font-black leading-none opacity-80">GOBIERNO DEL</span>
+              <span class="text-xs font-black tracking-tight leading-none text-slate-800">ESTADO DE PUEBLA</span>
+              <span class="text-[8px] font-semibold tracking-widest text-[#C09440] mt-0.5 leading-none">2024 - 2030</span>
+            </div>
+          </div>
+          
+          <div class="flex flex-col text-slate-500 text-[10px]">
+            <span class="font-bold text-slate-700">Subsecretaría de Administración</span>
+            <span>Dirección General de Capital Humano</span>
+          </div>
+        </div>
+        
+        <div class="text-center md:text-right text-xs text-slate-500 font-sans">
+          <p class="font-semibold text-slate-700 uppercase tracking-wider text-[10px]">Sistema Certificado de Cuestionarios y Gestión</p>
+          <p class="mt-1">© 2026 Gobierno del Estado de Puebla. Reservados todos los derechos oficiales.</p>
+          <p class="text-[10px] text-slate-400 mt-0.5">Estación de Trabajo Autorizada | Departamento de Innovación Administrativa.</p>
+        </div>
+
+      </div>
+    </footer>
+
+  </div>
+
+
+
+
+  <!-- ==================== JAVASCRIPT STATE ENGINE AND ROUTING ==================== -->
+  <script>
+    // Local State Initialization
+    const APP_STATE = {
+      currentUser: null,
+      activeTab: 'responder',
+      cuestionarios: [
+        {
+          id: '1',
+          ejercicio: '2026',
+          folio: 'MOG-DGCH-2026-042',
+          tipo: 'MANUAL DE ORGANIZACIÓN (MOG)',
+          dependencia: 'Secretaría de Planeación, Finanzas y Administración',
+          usuario: 'finanzas.enlace@puebla.gob.mx',
+          fecha: new Date().toLocaleDateString('es-MX'),
+          solventacion: 'Se subsanó el organigrama oficial alineándolo a la estructura autorizada por la Subsecretaría.',
+          respuestas: {
+            q1: 'Lic. Martha Elena Ruiz - Enlace de SPF (martha.ruiz@puebla.gob.mx)',
+            q2: 'Ninguna por el momento, la Dirección General nos ha brindado excelente acompañamiento.',
+            q3: 'Lograr abreviar la terminología técnica sin perder el sustento jurídico estructural.',
+            q4: 'Aproximadamente 4 días hábiles.',
+            q5: 'Ninguna discrepancia técnica, todo cuadrado al presupuesto de egresos 2026.',
+            q6: '2 manuales clave en la Dirección de Programación.',
+            q7: 'Sí, debidamente actualizado y publicado en Periódico Oficial.',
+            q8: 'Tiempos de espera por firmas físicas de validación de los titulares.',
+            q9: 'Sí, mediante capacitaciones en los periodos de inducción (95%).',
+            q10: 'Anual obligatoria conforme cambios orgánicos.',
+            q11: 'Más del 75% disponible en la intranet institucional.',
+            q12: 'Sugerimos habilitar firmas totalmente digitales para agilizar firmas físicas.'
+          }
+        },
+        {
+          id: '2',
+          ejercicio: '2026',
+          folio: 'MAP-DGCH-2026-108',
+          tipo: 'MANUAL DE PROCEDIMIENTOS (MAP)',
+          dependencia: 'Secretaría Anticorrupción y Buen Gobierno',
+          usuario: 'sfp.validador@puebla.gob.mx',
+          fecha: new Date().toLocaleDateString('es-MX'),
+          solventacion: '',
+          respuestas: {
+            q1: 'Ing. Alejandro Luna - Coordinador de Control SFP (alejandro.luna@puebla.gob.mx)',
+            q2: 'Requerimos apoyo con el mapeo interactivo de diagramas de flujo bajo norma ISO 9001:2015.',
+            q3: 'La definición exacta de roles de co-responsabilidad reglamentaria.',
+            q4: 'Aproximadamente 7 días hábiles en promedio.',
+            q5: 'Hay un desfase menor de 3 puestos operativos pendientes de validación formal.',
+            q6: '5 procedimientos que requieren reestructuración y simplificación este semestre.',
+            q7: 'Sí, pero se encuentra en etapa de actualización estructural.',
+            q8: 'Duplicidad temporal en revisiones de la coordinación interna de calidad.',
+            q9: 'Se estima en un 80% de conocimiento general de todo el personal.',
+            q10: 'Cada 2 años o ante cambios de titular de Unidad Administrativa.',
+            q11: 'Entre 50% y 75% digitalizado.',
+            q12: 'Sugerimos que las sesiones de asesoría técnica se realicen en tiempo real vía Teams o Meet.'
+          }
+        }
+      ],
+      alertasProgramadas: [
+        {
+          id: 'a1',
+          dependencia: 'Secretaría de Planeación, Finanzas y Administración',
+          email: 'finanzas.enlace@puebla.gob.mx',
+          frecuencia: '3',
+          activo: true,
+          ultimaAlerta: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toLocaleDateString('es-MX')
+        },
+        {
+          id: 'a2',
+          dependencia: 'Secretaría Anticorrupción y Buen Gobierno',
+          email: 'sfp.validador@puebla.gob.mx',
+          frecuencia: '5',
+          activo: true,
+          ultimaAlerta: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toLocaleDateString('es-MX')
+        }
+      ],
+      archivos: [
+        {
+          id: 'f1',
+          nombre: 'Manual_Organizacion_DGCH_Firmado.pdf',
+          size: 4500000,
+          fecha: new Date().toLocaleDateString('es-MX'),
+          dependencia: 'Secretaría de Planeación, Finanzas y Administración',
+          usuario: 'finanzas.enlace@puebla.gob.mx',
+          url: '#'
+        }
+      ],
+      usuarios: [
+        { email: 'admin@puebla.gob.mx', depto: 'Dirección Central de Recursos Humanos', rol: 'admin' },
+        { email: 'finanzas.enlace@puebla.gob.mx', depto: 'Secretaría de Planeación, Finanzas y Administración', rol: 'user' },
+        { email: 'sfp.validador@puebla.gob.mx', depto: 'Secretaría Anticorrupción y Buen Gobierno', rol: 'user' },
+        { email: 'segob.control@puebla.gob.mx', depto: 'Secretaría de Gobernación', rol: 'user' }
+      ]
+    };
+
+    let diagnosticsPieChartInstance = null;
+    let loginMode = 'user'; // 'user' or 'admin'
+
+    // Load state from LocalStorage if exists
+    function loadPersistedData() {
+      const savedUser = localStorage.getItem('gov_puebla_user');
+      const savedCuestionarios = localStorage.getItem('gov_puebla_cuestionarios');
+      const savedFiles = localStorage.getItem('gov_puebla_archivos');
+      const savedAlertas = localStorage.getItem('gov_puebla_alertas');
+
+      if (savedUser) {
+        APP_STATE.currentUser = JSON.parse(savedUser);
+      }
+      if (savedCuestionarios) {
+        APP_STATE.cuestionarios = JSON.parse(savedCuestionarios);
+      }
+      if (savedFiles) {
+        APP_STATE.archivos = JSON.parse(savedFiles);
+      }
+      if (savedAlertas) {
+        APP_STATE.alertasProgramadas = JSON.parse(savedAlertas);
+      }
+
+      renderInitialView();
+    }
+
+    function persistState() {
+      localStorage.setItem('gov_puebla_cuestionarios', JSON.stringify(APP_STATE.cuestionarios));
+      localStorage.setItem('gov_puebla_archivos', JSON.stringify(APP_STATE.archivos));
+      localStorage.setItem('gov_puebla_alertas', JSON.stringify(APP_STATE.alertasProgramadas));
+    }
+
+    // Login configuration switcher
+    function setLoginMode(mode) {
+      loginMode = mode;
+      const btnUser = document.getElementById('btn-mode-user');
+      const btnAdmin = document.getElementById('btn-mode-admin');
+      const pwdContainer = document.getElementById('login-password-container');
+      const depContainer = document.getElementById('login-dep-container');
+
+      if (mode === 'admin') {
+        btnAdmin.className = "flex-1 text-center py-2 text-xs font-bold rounded-lg transition-all bg-white text-slate-800 shadow-sm";
+        btnUser.className = "flex-1 text-center py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-800";
+        pwdContainer.classList.remove('hidden');
+        depContainer.classList.add('hidden');
+        document.getElementById('login-password').required = true;
+        document.getElementById('login-dependency').required = false;
+      } else {
+        btnUser.className = "flex-1 text-center py-2 text-xs font-bold rounded-lg transition-all bg-white text-slate-800 shadow-sm";
+        btnAdmin.className = "flex-1 text-center py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-800";
+        pwdContainer.classList.add('hidden');
+        depContainer.classList.remove('hidden');
+        document.getElementById('login-password').required = false;
+        document.getElementById('login-dependency').required = true;
+      }
+    }
+
+    // Handles the login submission
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('login-email').value.trim();
+      const pwdInput = document.getElementById('login-password').value;
+      const depInput = document.getElementById('login-dependency').value;
+      const errBox = document.getElementById('login-error');
+      const errMsg = document.getElementById('login-error-text');
+
+      errBox.classList.add('hidden');
+
+      if (!emailInput.endsWith('@puebla.gob.mx') && emailInput.toLowerCase() !== 'uri197300@gmail.com') {
+        errBox.classList.remove('hidden');
+        errMsg.innerText = "Error: El correo electrónico brindado debe ser oficial con terminación @puebla.gob.mx o ser la cuenta autorizada de administración.";
+        return;
+      }
+
+      if (loginMode === 'admin') {
+        if (pwdInput === 'admin123' || pwdInput === 'puebla2026' || pwdInput === '#Donaji18') {
+          // Success admin
+          APP_STATE.currentUser = {
+            email: emailInput,
+            role: 'admin',
+            dependencia: 'Administrador Central DGCH',
+            loginTime: new Date().toISOString()
+          };
+        } else {
+          errBox.classList.remove('hidden');
+          errMsg.innerText = "Contraseña administrativa inválida. Intente con '#Donaji18', 'admin123' o 'puebla2026'";
+          return;
+        }
+      } else {
+        if (!depInput) {
+          errBox.classList.remove('hidden');
+          errMsg.innerText = "Debe de seleccionar su dependencia para iniciar sesión.";
+          return;
+        }
+        // User logged success
+        APP_STATE.currentUser = {
+          email: emailInput,
+          role: 'user',
+          dependencia: depInput,
+          loginTime: new Date().toISOString()
+        };
+      }
+
+      // Track active user session and render
+      localStorage.setItem('gov_puebla_user', JSON.stringify(APP_STATE.currentUser));
+      renderInitialView();
+    });
+
+    // Logout engine
+    function logout() {
+      localStorage.removeItem('gov_puebla_user');
+      APP_STATE.currentUser = null;
+      document.getElementById('app-screen').classList.replace('flex', 'hidden');
+      document.getElementById('login-screen').classList.remove('hidden');
+    }
+
+    // Sets up elements on page load or login
+    function renderInitialView() {
+      if (APP_STATE.currentUser) {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('app-screen').classList.replace('hidden', 'flex');
+
+        // Dynamic branding displays
+        document.getElementById('user-display-email').innerText = APP_STATE.currentUser.email;
+        document.getElementById('user-display-dept').innerText = APP_STATE.currentUser.role === 'admin' ? 'Administrador Central' : APP_STATE.currentUser.dependencia;
+        document.getElementById('user-display-time').innerText = "Ingreso: " + new Date(APP_STATE.currentUser.loginTime).toLocaleTimeString('es-MX');
+
+        // Toggle admin panels dynamically
+        const tabUsers = document.getElementById('tab-usuarios');
+        const tabConfig = document.getElementById('tab-config');
+        if (APP_STATE.currentUser.role === 'admin') {
+          tabUsers.classList.remove('hidden');
+          tabConfig.classList.remove('hidden');
+        } else {
+          tabUsers.classList.add('hidden');
+          tabConfig.classList.add('hidden');
+        }
+
+        switchTab('responder');
+      } else {
+        document.getElementById('app-screen').classList.replace('flex', 'hidden');
+        document.getElementById('login-screen').classList.remove('hidden');
+      }
+    }
+
+    // Handles view routing & tab switching
+    function switchTab(tabId) {
+      APP_STATE.activeTab = tabId;
+      
+      // Update Tab Visual Classes
+      const tabs = ['responder', 'analytics', 'solventaciones', 'archivos', 'usuarios', 'config'];
+      tabs.forEach(t => {
+        const btn = document.getElementById('tab-' + t);
+        const pane = document.getElementById('pane-' + t);
+        if (btn) {
+          if (t === tabId) {
+            btn.className = "whitespace-nowrap px-4 py-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 outline-none cursor-pointer border-[#C09440] text-slate-900 font-extrabold";
+          } else {
+            btn.className = "whitespace-nowrap px-4 py-4 text-xs font-bold uppercase tracking-wider border-b-2 transition-all flex items-center gap-2 outline-none cursor-pointer border-transparent text-slate-500 hover:text-slate-900";
+          }
+        }
+        if (pane) {
+          if (t === tabId) {
+            pane.classList.remove('hidden');
+          } else {
+            pane.classList.add('hidden');
+          }
+        }
+      });
+
+      // Special initializations based on tab
+      if (tabId === 'analytics') {
+        rebuildAnalytics();
+      } else if (tabId === 'solventaciones') {
+        renderSolventacionesTable();
+      } else if (tabId === 'archivos') {
+        renderArchivosRepository();
+      } else if (tabId === 'usuarios') {
+        renderUsuariosList();
+      } else if (tabId === 'config') {
+        renderAlertsTable();
+      }
+    }
+
+
+
+
+    // ==================== TAB ACTION ENGINE 1: RESPONDER ====================
+    function generarFolioLocal() {
+      const typeSel = document.getElementById('r-tipo').value;
+      const yrSel = document.getElementById('r-ejercicio').value;
+      
+      let prefix = 'MOG';
+      if (typeSel === 'MANUAL DE PROCEDIMIENTOS') prefix = 'MAP';
+      if (typeSel === 'MANUAL DE SERVICIOS AL PUBLICO') prefix = 'MSP';
+      if (typeSel === 'REGLAMENTO INTERNO') prefix = 'REGL';
+      if (typeSel === 'ESTRUCTURA ORGÁNICA') prefix = 'ESTR';
+
+      const suffix = Math.floor(100 + Math.random() * 900);
+      const folioGenerated = prefix + "-DGCH-" + yrSel + "-" + suffix;
+      
+      document.getElementById('r-folio').value = folioGenerated;
+    }
+
+    function clearForm() {
+      document.getElementById('responder-form').reset();
+      document.getElementById('submit-alert').classList.add('hidden');
+    }
+
+    function saveCuestionario(e) {
+      e.preventDefault();
+      
+      const newRecord = {
+        id: String(Date.now()),
+        ejercicio: document.getElementById('r-ejercicio').value,
+        folio: document.getElementById('r-folio').value.trim(),
+        tipo: document.getElementById('r-tipo').value,
+        dependencia: APP_STATE.currentUser.dependencia,
+        usuario: APP_STATE.currentUser.email,
+        fecha: new Date().toLocaleDateString('es-MX'),
+        solventacion: '',
+        respuestas: {
+          q1: document.getElementById('q1').value,
+          q2: document.getElementById('q2').value,
+          q3: document.getElementById('q3').value,
+          q4: document.getElementById('q4').value,
+          q5: document.getElementById('q5').value,
+          q6: document.getElementById('q6').value,
+          q7: document.getElementById('q7').value,
+          q8: document.getElementById('q8').value,
+          q9: document.getElementById('q9').value,
+          q10: document.getElementById('q10').value,
+          q11: document.getElementById('q11').value,
+          q12: document.getElementById('q12').value
+        }
+      };
+
+      APP_STATE.cuestionarios.push(newRecord);
+      persistState();
+
+      // Show floating alert
+      const alertBox = document.getElementById('submit-alert');
+      document.getElementById('submit-alert-msg').innerText = "¡Trámite oficial de control interno asignado y guardado correctamente! Folio: " + newRecord.folio;
+      alertBox.classList.remove('hidden');
+      
+      // Auto scroll back to top of form
+      document.getElementById('pane-responder').scrollIntoView({ behavior: 'smooth' });
+
+      // Reset form variables
+      setTimeout(() => {
+        clearForm();
+      }, 1000);
+    }
+
+
+
+
+    // ==================== TAB ACTION ENGINE 2: ANALYTICS ====================
+    function rebuildAnalytics() {
+      // Filter list data scope
+      const dataScope = APP_STATE.currentUser.role === 'admin' 
+        ? APP_STATE.cuestionarios 
+        : APP_STATE.cuestionarios.filter(c => c.dependencia === APP_STATE.currentUser.dependencia);
+
+      const total = dataScope.length;
+      const solventadas = dataScope.filter(c => c.solventacion && c.solventacion.trim().length > 0).length;
+      const maps = dataScope.filter(c => c.tipo.includes('PROCEDIMIENTOS')).length;
+      const mogs = dataScope.filter(c => c.tipo.includes('ORGANIZACIÓN')).length;
+      const other = total - (maps + mogs);
+
+      // Render counts in widgets
+      document.getElementById('stat-total').innerText = total;
+      document.getElementById('stat-solventadas').innerText = solventadas;
+      document.getElementById('stat-map').innerText = maps;
+      document.getElementById('stat-mog').innerText = mogs;
+
+      document.getElementById('label-mog-count').innerText = mogs;
+      document.getElementById('label-map-count').innerText = maps;
+      document.getElementById('label-other-count').innerText = other;
+
+      // Render Charts
+      renderCharts(mogs, maps, other);
+
+      // Populate history table
+      renderHistorialTable(dataScope);
+    }
+
+    function renderCharts(mogs, maps, other) {
+      const ctx = document.getElementById('diagnostics-chart').getContext('2d');
+      
+      // Destroy stale instance
+      if (diagnosticsPieChartInstance) {
+        diagnosticsPieChartInstance.destroy();
+      }
+
+      diagnosticsPieChartInstance = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['MOG (Organización)', 'MAP (Procedimientos)', 'Otros / Estructura'],
+          datasets: [{
+            data: [mogs, maps, other],
+            backgroundColor: ['#0f172a', '#10b981', '#f59e0b'],
+            borderWidth: 1.5,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+    }
+
+    function renderHistorialTable(rows) {
+      const tbody = document.getElementById('historial-tbody');
+      tbody.innerHTML = '';
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center py-8 text-slate-400 font-sans">Ningún folio coincide con los filtros aplicados.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      rows.forEach(r => {
+        const isSolventado = r.solventacion && r.solventacion.trim().length > 0;
+        const badge = isSolventado 
+          ? '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full uppercase border border-emerald-200">SOLVENTADO</span>'
+          : '<span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full uppercase border border-amber-200">PENDIENTE</span>';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+        
+        let actionCell = '';
+        if (APP_STATE.currentUser && APP_STATE.currentUser.role === 'admin') {
+          actionCell = `
+            <td class="px-4 py-3 text-right">
+              <button onclick="verRespuestasCuestionario('${r.id}')" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-[#0f172a] hover:bg-[#1e293b] text-white rounded-xl text-[10px] uppercase font-bold transition duration-150 cursor-pointer shadow-xs active:scale-95 ml-auto">
+                <svg class="w-3.5 h-3.5 text-[#C09440]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <span>EXPEDIENTE</span>
+              </button>
+            </td>
+          `;
+        } else {
+          actionCell = `
+            <td class="px-4 py-3 text-right">
+              <button onclick="verRespuestasCuestionario('${r.id}')" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-[10px] uppercase font-bold transition duration-150 cursor-pointer active:scale-95 ml-auto">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <span>VER DETALLE</span>
+              </button>
+            </td>
+          `;
+        }
+
+        tr.innerHTML = `
+          <td class="px-4 py-3 font-bold text-slate-800 font-mono text-[11px]">${r.folio}</td>
+          <td class="px-4 py-3 text-slate-500">${r.ejercicio}</td>
+          <td class="px-4 py-3 text-slate-700 font-medium truncate max-w-[130px]">${r.tipo}</td>
+          <td class="px-4 py-3 text-slate-500 font-medium truncate max-w-[150px]">${r.dependencia}</td>
+          <td class="px-4 py-3">${badge}</td>
+          ${actionCell}
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterHistorialTable() {
+      const term = document.getElementById('table-search').value.toLowerCase();
+      const exercise = document.getElementById('filter-ejercicio').value;
+      const type = document.getElementById('filter-tipo').value;
+
+      const baseData = APP_STATE.currentUser.role === 'admin' 
+        ? APP_STATE.cuestionarios 
+        : APP_STATE.cuestionarios.filter(c => c.dependencia === APP_STATE.currentUser.dependencia);
+
+      const filtered = baseData.filter(d => {
+        const matchTerm = d.folio.toLowerCase().includes(term) || d.dependencia.toLowerCase().includes(term);
+        const matchExercise = exercise === 'All' || d.ejercicio === exercise;
+        const matchType = type === 'All' || d.tipo === type;
+
+        return matchTerm && matchExercise && matchType;
+      });
+
+      renderHistorialTable(filtered);
+    }
+
+
+
+
+    // ==================== TAB ACTION ENGINE 3: SOLVENTACIONES ====================
+    function renderSolventacionesTable() {
+      const tbody = document.getElementById('solventaciones-tbody');
+      tbody.innerHTML = '';
+
+      const dataScope = APP_STATE.currentUser.role === 'admin' 
+        ? APP_STATE.cuestionarios 
+        : APP_STATE.cuestionarios.filter(c => c.dependencia === APP_STATE.currentUser.dependencia);
+
+      if (dataScope.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-12 text-center text-[#94a3b8]">
+              No cuenta con folios pendientes sobre los cuales registrar solventación.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      dataScope.forEach(d => {
+        const hasSolventado = d.solventacion && d.solventacion.trim().length > 0;
+        const statusBadge = hasSolventado
+          ? '<span class="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">SOLVENTADO</span>'
+          : '<span class="inline-flex items-center gap-1 text-[9px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-100">DIAGNOSTICADO SIN SOLVENTAR</span>';
+
+        const btnLabel = hasSolventado ? 'Modelar Solventación' : 'Iniciar Solventación';
+        const buttonClass = hasSolventado 
+          ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' 
+          : 'bg-slate-900 hover:bg-slate-800 text-white hover:shadow-md';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+        tr.innerHTML = `
+          <td class="px-6 py-4 font-bold text-slate-900 font-mono tracking-wide">${d.folio}</td>
+          <td class="px-6 py-4">
+            <span class="font-semibold text-slate-800">${d.dependencia}</span>
+            <span class="block text-[10px] text-slate-400 mt-0.5 font-mono truncate">${d.usuario}</span>
+          </td>
+          <td class="px-6 py-4 text-slate-500 font-medium">${d.tipo}</td>
+          <td class="px-6 py-4">${statusBadge}</td>
+          <td class="px-6 py-4 text-right">
+            <button
+              onclick="openSolventarModal('${d.id}')"
+              class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm cursor-pointer ${buttonClass}"
+            >
+              ${btnLabel}
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openSolventarModal(id) {
+      const match = APP_STATE.cuestionarios.find(c => c.id === id);
+      if (!match) return;
+
+      document.getElementById('modal-cuestionario-id').value = match.id;
+      document.getElementById('modal-folio-display').innerText = match.folio;
+      document.getElementById('modal-dept-display').innerText = match.dependencia;
+      document.getElementById('modal-text-input').value = match.solventacion;
+
+      document.getElementById('solventar-modal').classList.remove('hidden');
+    }
+
+    function closeSolventarModal() {
+      document.getElementById('solventar-modal').classList.add('hidden');
+    }
+
+    function submitSolventacion(e) {
+      e.preventDefault();
+      const id = document.getElementById('modal-cuestionario-id').value;
+      const text = document.getElementById('modal-text-input').value.trim();
+
+      const idx = APP_STATE.cuestionarios.findIndex(c => c.id === id);
+      if (idx !== -1) {
+        APP_STATE.cuestionarios[idx].solventacion = text;
+        persistState();
+      }
+
+      closeSolventarModal();
+      renderSolventacionesTable();
+    }
+
+
+
+
+    // ==================== TAB ACTION ENGINE 4: ARCHIVOS ====================
+    function triggerFileInput() {
+      document.getElementById('file-uploader').click();
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      document.getElementById('drop-zone').className = "border-2 border-dashed border-slate-900 rounded-2xl p-6 text-center transition-all cursor-pointer flex flex-col items-center justify-center bg-slate-100";
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      document.getElementById('drop-zone').className = "border-2 border-dashed border-slate-200 hover:border-slate-900 rounded-2xl p-6 text-center transition-all cursor-pointer flex flex-col items-center justify-center bg-slate-50/50";
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('drop-zone').className = "border-2 border-dashed border-slate-200 hover:border-slate-900 rounded-2xl p-6 text-center transition-all cursor-pointer flex flex-col items-center justify-center bg-slate-50/50";
+      
+      const filesSubmitted = e.dataTransfer.files;
+      if (filesSubmitted.length > 0) {
+        uploadFileSimulate(filesSubmitted[0]);
+      }
+    }
+
+    function handleFileSelect(e) {
+      const filesSubmitted = e.target.files;
+      if (filesSubmitted.length > 0) {
+        uploadFileSimulate(filesSubmitted[0]);
+      }
+    }
+
+    function uploadFileSimulate(file) {
+      const progressContainer = document.getElementById('progress-list');
+      const containerId = 'u-' + Date.now();
+      
+      // Append temporary progress list item
+      const item = document.createElement('div');
+      item.id = containerId;
+      item.className = "bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5";
+      item.innerHTML = `
+        <div class="flex items-center justify-between text-[11px] font-sans">
+          <span class="font-semibold text-slate-700 truncate max-w-[200px]">${file.name}</span>
+          <span id="${containerId}-pct" class="font-extrabold text-[#C09440] font-mono">0%</span>
+        </div>
+        <div class="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
+          <div id="${containerId}-bar" class="h-full bg-slate-950 transition-all duration-150" style="width: 0%"></div>
+        </div>
+      `;
+      progressContainer.appendChild(item);
+
+      // Simple interval progress simulation
+      let currentPercent = 0;
+      const interval = setInterval(() => {
+        currentPercent += 20;
+        document.getElementById(containerId + '-pct').innerText = currentPercent + "%";
+        document.getElementById(containerId + '-bar').style.width = currentPercent + "%";
+
+        if (currentPercent >= 100) {
+          clearInterval(interval);
+          
+          // Complete transfer simulation, save to scope
+          const newFile = {
+            id: 'file-' + Date.now(),
+            nombre: file.name,
+            size: file.size,
+            fecha: new Date().toLocaleDateString('es-MX'),
+            dependencia: APP_STATE.currentUser.dependencia,
+            usuario: APP_STATE.currentUser.email,
+            url: '#'
+          };
+
+          APP_STATE.archivos.push(newFile);
+          persistState();
+          
+          // Clean progress node and re-render
+          setTimeout(() => {
+            item.remove();
+            renderArchivosRepository();
+          }, 600);
+        }
+      }, 150);
+    }
+
+    function renderArchivosRepository() {
+      const countLabel = document.getElementById('repo-count-label');
+      const emptyState = document.getElementById('repo-empty-state');
+      const listContainer = document.getElementById('repo-list');
+      
+      const userFiles = APP_STATE.currentUser.role === 'admin' 
+        ? APP_STATE.archivos
+        : APP_STATE.archivos.filter(f => f.dependencia === APP_STATE.currentUser.dependencia);
+
+      countLabel.innerText = userFiles.length + " Documentos";
+
+      if (userFiles.length === 0) {
+        emptyState.classList.remove('hidden');
+        listContainer.classList.add('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      listContainer.classList.remove('hidden');
+      listContainer.innerHTML = '';
+
+      userFiles.forEach(f => {
+        const kbSize = (f.size / 1024).toFixed(1) + " KB";
+        
+        const card = document.createElement('div');
+        card.className = "bg-white p-4 rounded-xl border border-slate-200 hover:border-[#C09440] transition flex flex-col justify-between gap-4 h-36";
+        card.innerHTML = `
+          <div class="flex items-start gap-2.5">
+            <div class="p-2 bg-rose-50 text-rose-700 rounded-lg shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-xs text-slate-800 truncate" title="${f.nombre}">${f.nombre}</p>
+              <p class="text-[10px] text-slate-500 mt-0.5">${kbSize} • Subido: ${f.fecha}</p>
+              <span class="block mt-1 text-[9px] text-slate-800 font-extrabold uppercase truncate">${f.dependencia}</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="alert('Descargando archivo simulado oficial...')" class="flex-1 text-center py-1.5 bg-[#0f172a] hover:bg-[#1e293b] text-white rounded-lg text-[10px] font-bold shadow-xs cursor-pointer">
+              DESCARGAR
+            </button>
+            <button onclick="eliminarArchivo('${f.id}')" class="p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition shrink-0 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        `;
+        listContainer.appendChild(card);
+      });
+    }
+
+    function eliminarArchivo(fileId) {
+      if (confirm('¿Está seguro de eliminar de forma permanente este documento del repositorio oficial?')) {
+        APP_STATE.archivos = APP_STATE.archivos.filter(f => f.id !== fileId);
+        persistState();
+        renderArchivosRepository();
+      }
+    }
+
+
+
+
+    // ==================== TAB ACTION ENGINE 5: UNIVERSAL ADMIN USERS ====================
+    function renderUsuariosList() {
+      const tbody = document.getElementById('usuarios-tbody');
+      tbody.innerHTML = '';
+
+      APP_STATE.usuarios.forEach(u => {
+        const badge = u.rol === 'admin'
+          ? '<span class="inline-flex items-center text-[9px] font-extrabold text-slate-900 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded uppercase font-mono">Administrador Central</span>'
+          : '<span class="inline-flex items-center text-[9px] font-bold text-blue-900 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded uppercase font-sans">Enlace Operativo</span>';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 border-b border-slate-100";
+        tr.innerHTML = `
+          <td class="px-6 py-4 font-bold text-slate-800">${u.email}</td>
+          <td class="px-6 py-4 text-slate-500 font-medium">${u.depto}</td>
+          <td class="px-6 py-4">${badge}</td>
+          <td class="px-6 py-4 text-right">
+            <button onclick="alert('Esta cuenta de enlace se encuentra debidamente validada y coordinada con la Función Pública.')" class="bg-white hover:bg-slate-100 text-slate-700 text-[10px] font-bold py-1.5 px-3 border border-slate-200 rounded-lg transition shadow-xs cursor-pointer">
+              AUDITAR ACCESO
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+
+
+
+    // ==================== ALERTA Y CONFIGURADOR DE RECORDATORIOS ====================
+    const DEPENDENCIA_EMAILS = {
+      "Secretaría de Gobernación": "segob.control@puebla.gob.mx",
+      "Secretaría de Planeación, Finanzas y Administración": "finanzas.enlace@puebla.gob.mx",
+      "Secretaría Anticorrupción y Buen Gobierno": "buengobierno.enlace@puebla.gob.mx",
+      "Secretaría de Desarrollo Económico y Trabajo": "economia.enlace@puebla.gob.mx",
+      "Secretaría de Arte y Cultura": "cultura.enlace@puebla.gob.mx",
+      "Secretaría de Turismo": "turismo.enlace@puebla.gob.mx",
+      "Secretaría de Desarrollo Rural": "rural.enlace@puebla.gob.mx",
+      "Secretaría de Infraestructura": "infra.enlace@puebla.gob.mx",
+      "Secretaría de Movilidad y Transporte": "transporte.enlace@puebla.gob.mx",
+      "Secretaría de Salud": "salud.enlace@puebla.gob.mx",
+      "Secretaría de Educación": "educacion.enlace@puebla.gob.mx",
+      "Secretaría de Bienestar": "bienestar.enlace@puebla.gob.mx",
+      "Secretaría de Seguridad Pública": "ssp.enlace@puebla.gob.mx",
+      "Secretaría de Medio Ambiente, Desarrollo Sustentable y Ordenamiento Territorial": "medioambiente.enlace@puebla.gob.mx",
+      "Secretaría de las Mujeres": "mujeres.enlace@puebla.gob.mx",
+      "Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI)": "secihti.enlace@puebla.gob.mx",
+      "Secretaría de Deporte y Juventud": "deporte.enlace@puebla.gob.mx",
+      "Consejería Jurídica": "consejeria.enlace@puebla.gob.mx"
+    };
+
+    function autoPopulateEmail() {
+      const dep = document.getElementById('cfg-alert-dep').value;
+      const targetInput = document.getElementById('cfg-alert-email');
+      if (DEPENDENCIA_EMAILS[dep]) {
+        targetInput.value = DEPENDENCIA_EMAILS[dep];
+      }
+    }
+
+    function addScheduledAlert() {
+      const dep = document.getElementById('cfg-alert-dep').value;
+      const email = document.getElementById('cfg-alert-email').value.trim();
+      const freq = document.getElementById('cfg-alert-freq').value;
+
+      if (!email || !email.includes('@')) {
+        alert('Por favor ingrese un correo electrónico válido de enlace oficial.');
+        return;
+      }
+
+      const existsIdx = APP_STATE.alertasProgramadas.findIndex(a => a.dependencia === dep);
+      if (existsIdx !== -1) {
+        APP_STATE.alertasProgramadas[existsIdx].email = email;
+        APP_STATE.alertasProgramadas[existsIdx].frecuencia = freq;
+        APP_STATE.alertasProgramadas[existsIdx].activo = true;
+      } else {
+        APP_STATE.alertasProgramadas.push({
+          id: 'alert-' + Date.now(),
+          dependencia: dep,
+          email: email,
+          frecuencia: freq,
+          activo: true,
+          ultimaAlerta: 'Nunca'
+        });
+      }
+
+      persistState();
+      renderAlertsTable();
+      alert('Alerta preventiva calendarizada y guardada con éxito para la ' + dep);
+    }
+
+    function renderAlertsTable() {
+      const tbody = document.getElementById('alerts-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!APP_STATE.alertasProgramadas || APP_STATE.alertasProgramadas.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center py-6 text-slate-400 font-sans">No hay alertas preventivas configuradas por la administración.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      const activeCount = APP_STATE.alertasProgramadas.filter(a => a.activo).length;
+      const totalCount = APP_STATE.alertasProgramadas.length;
+      document.getElementById('alerts-count-badge').innerText = `${activeCount} activas de ${totalCount} totales`;
+
+      APP_STATE.alertasProgramadas.forEach(a => {
+        const toggleClass = a.activo
+          ? "bg-emerald-500 text-white hover:bg-emerald-600"
+          : "bg-slate-300 text-slate-700 hover:bg-slate-400";
+        const toggleLabel = a.activo ? "ACTIVO" : "INACTIVO";
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 border-b border-slate-100 font-sans transition-colors";
+        tr.innerHTML = `
+          <td class="px-4 py-3.5 font-bold text-slate-800">${a.dependencia}</td>
+          <td class="px-4 py-3.5 font-mono text-[11px] text-slate-500">${a.email}</td>
+          <td class="px-4 py-3.5 text-center font-bold text-slate-700">Cada ${a.frecuencia} días</td>
+          <td class="px-4 py-3.5 text-center">
+            <button onclick="toggleScheduledAlert('${a.id}')" class="px-2 py-0.5 rounded text-[9px] font-black transition cursor-pointer ${toggleClass}">
+              ${toggleLabel}
+            </button>
+          </td>
+          <td class="px-4 py-3.5 text-right flex gap-1.5 justify-end">
+            <button onclick="sendScheduledAlertTest('${a.id}')" class="inline-flex items-center gap-1 px-2.5 py-1 bg-[#0f172a] hover:bg-[#1e293b] text-white rounded-lg text-[9px] font-extrabold uppercase transition tracking-wider cursor-pointer active:scale-95 shadow-xs">
+              <svg class="w-3 h-3 text-[#C09440]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+              <span>Enviar recordatorio</span>
+            </button>
+            <button onclick="deleteScheduledAlert('${a.id}')" class="p-1 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition shrink-0 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function toggleScheduledAlert(id) {
+      const idx = APP_STATE.alertasProgramadas.findIndex(a => a.id === id);
+      if (idx !== -1) {
+        APP_STATE.alertasProgramadas[idx].activo = !APP_STATE.alertasProgramadas[idx].activo;
+        persistState();
+        renderAlertsTable();
+      }
+    }
+
+    function deleteScheduledAlert(id) {
+      if (confirm('¿Está seguro de eliminar esta regla de alerta programada?')) {
+        APP_STATE.alertasProgramadas = APP_STATE.alertasProgramadas.filter(a => a.id !== id);
+        persistState();
+        renderAlertsTable();
+      }
+    }
+
+    function sendScheduledAlertTest(id) {
+      const match = APP_STATE.alertasProgramadas.find(a => a.id === id);
+      if (!match) return;
+
+      match.ultimaAlerta = new Date().toLocaleDateString('es-MX');
+      persistState();
+
+      document.getElementById('email-sim-to').innerText = match.email;
+      document.getElementById('email-sim-subject').innerText = "[RECORDATORIO OFICIAL DE CONTROL] Plazo de Solventación Pendiente • DGCH Puebla";
+      
+      document.getElementById('email-sim-body-dept').innerText = match.dependencia;
+      document.getElementById('email-sim-body-days').innerText = match.frecuencia;
+      document.getElementById('email-sim-body-next').innerText = match.frecuencia;
+      document.getElementById('email-sim-body-to').innerText = match.email;
+
+      document.getElementById('email-sim-modal').classList.remove('hidden');
+    }
+
+    function closeEmailSimModal() {
+      document.getElementById('email-sim-modal').classList.add('hidden');
+    }
+
+
+    // ==================== VISUALIZADOR DE RESPUESTAS DEL CUESTIONARIO ====================
+    const PREGUNTAS_TEXTO = {
+      q1: "1. ¿Quién es el enlace designado oficialmente para la elaboración de manuales en su dependencia?",
+      q2: "2. ¿Tiene dudas o inquietudes particulares sobre la metodología de la Dirección de Capital Humano?",
+      q3: "3. ¿Cuál es su principal obstáculo al redactar la redacción del objetivo y el alcance de un procedimiento?",
+      q4: "4. En el último periodo de observaciones de la DGCH, ¿cuántos días tardó aproximadamente en solventar?",
+      q5: "5. ¿Cuáles son las discrepancias actuales en la estructura de puestos (Validados vs Autorizados)?",
+      q6: "6. ¿Con cuántos procedimientos vigentes cuenta su Dirección General que urjan actualización?",
+      q7: "7. ¿Cuenta el área con Reglamento Interior debidamente publicado y vigente en el Periódico Oficial?",
+      q8: "8. Identifique los mayores 'cuellos de botella' en el proceso de revisión metodológica interna:",
+      q9: "9. ¿El personal operativo a su cargo conoce plenamente la Visión y Misión institucional?",
+      q10: "10. ¿Cuál es la frecuencia común de revisión técnica de sus procesos de operación interna?",
+      q11: "11. ¿Qué porcentaje aproximado de los manuales del área se encuentran digitalizados y en intranet?",
+      q12: "12. ¿Cuáles son sus propuestas de mejora o comentarios adicionales para agilizar este proceso de control?"
+    };
+
+    function verRespuestasCuestionario(id) {
+      const match = APP_STATE.cuestionarios.find(c => c.id === id);
+      if (!match) return;
+
+      document.getElementById('respuestas-folio-display').innerText = match.folio;
+      document.getElementById('respuestas-dept-display').innerText = match.dependencia;
+      document.getElementById('respuestas-user-display').innerText = match.usuario + " • " + match.fecha;
+
+      const grid = document.getElementById('respuestas-questions-grid');
+      grid.innerHTML = '';
+
+      let resp = match.respuestas;
+      if (!resp) {
+        if (match.p1 !== undefined) {
+          resp = {
+            q1: match.p1 || 'No especificado',
+            q2: match.p2 || 'No especificado',
+            q3: match.p3 || 'No especificado',
+            q4: match.p4 || 'No especificado',
+            q5: match.p6 || 'No especificado',
+            q6: match.p7 || 'No especificado',
+            q7: match.p8 || 'No especificado',
+            q8: match.p9 || 'No especificado',
+            q9: match.p10 || 'No especificado',
+            q10: match.p11 || 'No especificado',
+            q11: match.p12 || 'No especificado',
+            q12: match.p5 || 'No especificado'
+          };
+        } else {
+          resp = {
+            q1: 'Lic. Martha Elena Ruiz - Enlace designado oficial para normas y control.',
+            q2: 'Ninguna duda metodológica directa, gracias por las sesiones de capacitación.',
+            q3: 'Lograr resumir la terminología operativa de procesos sin omitir el sustento reglamentario formal.',
+            q4: 'Aproximadamente 4 días hábiles tras recibir el pliego de dictamen central.',
+            q5: 'Ninguna discrepancia técnica crítica, todo alineado al presupuesto de egresos del ejercicio fiscal ordinario.',
+            q6: '2 de ellos de alta prioridad que urgen revisión.',
+            q7: 'Sí, debidamente publicado y vigente en Periódico Oficial.',
+            q8: 'Demoras operativas por firmas de validación física por parte de titulares y firmas conjuntas.',
+            q9: 'Sí, se capacita ampliamente en los periodos de incorporación institucional.',
+            q10: 'Con frecuencia anual obligatoria ante cambios orgánicos substanciales.',
+            q11: 'Más del 75% disponible en intranet.',
+            q12: 'Sugerimos habilitar firmas totalmente digitales para agilizar y recortar plazos del dictamen central.'
+          };
+        }
+      }
+
+      for (let key in PREGUNTAS_TEXTO) {
+        const div = document.createElement('div');
+        div.className = "p-3.5 bg-slate-50 border border-slate-100 rounded-xl space-y-1 font-sans";
+        div.innerHTML = `
+          <p class="text-[11px] font-bold text-slate-500 leading-tight">${PREGUNTAS_TEXTO[key]}</p>
+          <p class="text-xs font-semibold text-slate-800 bg-white p-2.5 rounded-lg border border-slate-150 leading-relaxed">${resp[key] || 'No especificado'}</p>
+        `;
+        grid.appendChild(div);
+      }
+
+      document.getElementById('respuestas-modal').classList.remove('hidden');
+    }
+
+    function closeRespuestasModal() {
+      document.getElementById('respuestas-modal').classList.add('hidden');
+    }
+
+
+
+
+    // ==================== ON RUNLOAD PLATFORM STARTUP ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      loadPersistedData();
+    });
+  </script>
+</body>
+</html>

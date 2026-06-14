@@ -7,23 +7,24 @@ interface LoginProps {
 }
 
 const DEPENDENCIAS = [
-  "Secretaría de Planeación y Finanzas",
   "Secretaría de Gobernación",
-  "Secretaría de Seguridad Pública",
-  "Secretaría de Educación",
-  "Secretaría de Salud",
-  "Secretaría de Infraestructura",
-  "Secretaría de Bienestar",
-  "Secretaría de Desarrollo Rural",
-  "Secretaría de Economía",
-  "Secretaría de Trabajo",
-  "Secretaría de Cultura",
+  "Secretaría de Planeación, Finanzas y Administración",
+  "Secretaría Anticorrupción y Buen Gobierno",
+  "Secretaría de Desarrollo Económico y Trabajo",
+  "Secretaría de Arte y Cultura",
   "Secretaría de Turismo",
-  "Secretaría de Medio Ambiente",
+  "Secretaría de Desarrollo Rural",
+  "Secretaría de Infraestructura",
   "Secretaría de Movilidad y Transporte",
-  "Consejería Jurídica",
-  "Contraloría",
-  "Coordinación General de Comunicación"
+  "Secretaría de Salud",
+  "Secretaría de Educación",
+  "Secretaría de Bienestar",
+  "Secretaría de Seguridad Pública",
+  "Secretaría de Medio Ambiente, Desarrollo Sustentable y Ordenamiento Territorial",
+  "Secretaría de las Mujeres",
+  "Secretaría de Ciencia, Humanidades, Tecnología e Innovación (SECIHTI)",
+  "Secretaría de Deporte y Juventud",
+  "Consejería Jurídica"
 ];
 
 const ADMIN_EMAIL = 'uri197300@gmail.com';
