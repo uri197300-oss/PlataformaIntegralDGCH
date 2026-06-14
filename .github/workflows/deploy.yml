@@ -1,29 +1,52 @@
-name: Deploy to GitHub Pages
+# Workflow oficial de GitHub para compilar y desplegar aplicaciones de React/Vite directamente a Pages
+name: Desplegar a GitHub Pages
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: ["main", "master"]
+  workflow_dispatch:
 
+# Configura los permisos del GITHUB_TOKEN para permitir el despliegue automático
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+# Evita colisiones de ejecuciones simultáneas
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
-    concurrency: ci-${{ github.ref }}
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout 🛎️
+      - name: Checkout del código 🛎️
         uses: actions/checkout@v4
 
-      - name: Install and Build 🔧
-        run: |
-          npm ci
-          npm run build
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Configurar Node.js 🔧
+        uses: actions/setup-node@v4
         with:
-          folder: dist # The folder the action should deploy.
-          branch: gh-pages # The branch the action should deploy to.
+          node-version: 20
+          cache: 'npm'
+
+      - name: Instalar dependencias 📦
+        run: npm ci
+
+      - name: Compilar aplicación React/Vite 🚀
+        run: npm run build
+
+      - name: Configurar GitHub Pages ⚙️
+        uses: actions/configure-pages@v4
+
+      - name: Subir el resultado de la compilación (dist) 📤
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+      - name: Publicar en GitHub Pages 🌐
+        id: deployment
+        uses: actions/deploy-pages@v4
